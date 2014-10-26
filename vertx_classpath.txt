@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 src/main/resources
 build/classes/main
 out/production/happiness
 out/test/happiness
 build/deps
+=======
+src/main/resources
+build/classes/main
+out/production/happiness
+out/test/happiness
+build/deps
+>>>>>>> FETCH_HEAD

@@ -18,9 +18,10 @@
 package com.mycompany.myproject;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.Message;
-import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Verticle;
 
 /*
@@ -30,9 +31,10 @@ import org.vertx.java.platform.Verticle;
  */
 public class PingVerticle extends Verticle {
 
+  private final Logger logger = LoggerFactory.getLogger(PingVerticle.class);
+
   public void start() {
 
-    final Logger logger = container.logger();
 
     vertx.eventBus().registerHandler("ping-address", new Handler<Message<String>>() {
       @Override
