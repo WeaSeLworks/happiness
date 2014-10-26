@@ -24,12 +24,6 @@ public class TwitterVerticle extends BusModBase {
 
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(TwitterVerticle.class);
 
-
-    private static final String CONSUMER_KEY = "";
-    private static final String CONSUMER_SECRET = "";
-    private static final String ACCESS_KEY = "";
-    private static final String ACCESS_SECRET = "";
-
     TwitterStream twitterStream = null;
 
     public void start() {
@@ -57,14 +51,8 @@ public class TwitterVerticle extends BusModBase {
             }
         };
 
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
-                .setOAuthConsumerKey(CONSUMER_KEY)
-                .setOAuthConsumerSecret(CONSUMER_SECRET)
-                .setOAuthAccessToken(ACCESS_KEY)
-                .setOAuthAccessTokenSecret(ACCESS_SECRET);
 
-        twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
+        twitterStream = new TwitterStreamFactory().getInstance();
         twitterStream.addListener(statusListener);
 
 
@@ -76,6 +64,4 @@ public class TwitterVerticle extends BusModBase {
 
         logger.info("Spinning up...");
     }
-
-
 }
