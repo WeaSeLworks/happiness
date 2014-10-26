@@ -60,6 +60,8 @@ dependencies {
   provided "io.vertx:lang-groovy:$groovyLangModVersion@jar"
   compile 'uk.bl.wa.sentimentalj:sentimentalj:1.0.2'
   compile "com.nhncorp:mod-socket-io:1.0.1"
+  compile 'org.twitter4j:twitter4j-core:4.0.2'
+  compile 'org.twitter4j:twitter4j-stream:4.0.2'
 
 }
 
