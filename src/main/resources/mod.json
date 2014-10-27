@@ -37,6 +37,8 @@
   "keywords": ["gerbils", "cars", "cheese", "chocolate", "underpants", "herring"],
   "homepage": "url to your project page",
 
-  "auto-redeploy": true
+  "auto-redeploy": true,
+
+  "vertx":"2.1.2"
 
 }
