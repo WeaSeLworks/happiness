@@ -10,6 +10,8 @@ public class Happiness extends Verticle {
     @Override
     public void start() {
         getContainer().deployWorkerVerticle("com.github.weaselworks.happiness.twitter.TwitterVerticle");
+        getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.LanguageDetect");
+        getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.MachineTranslation");
         getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.SentimentAnalyser");
     }
 }
