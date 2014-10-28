@@ -1,48 +1,91 @@
-<!DOCTYPE html>
-<html>
-<head lang="en">
-    <meta charset="UTF-8">
-    <title>Hap-PI-ness</title>
-</head>
-<body>
-
-</body>
-</html>
-
-
 <html>
 <head>
-    <title>SockJS Test</title>
+    <title>Hap-PI-ness</title>
     <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+    <script src="vertxbus-2.1.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+    <!-- Google Maps -->
+    <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=visualization"></script>
+
+    <script>
+
+        window.onload = init;
+
+        function init() {
+
+            console.log('In init() innit');
+
+            // get the elements
+            var serverArea = document.getElementById('outserver');
+
+            // Get a handle to the eventbus
+            var eb = new vertx.EventBus('http://localhost:9090/eventbus');
+            console.log('Got event bus handle');
+
+            // When the eventbus is ready, register a listener
+            eb.onopen = function() {
+
+                console.log('Socket to vert.x EventBus opened');
+
+                // Register for server events
+                eb.registerHandler('msg.server', function(message) {
+                    serverArea.value+=JSON.stringify(message)+'\n';
+                });
+                console.log('Registered handler for msg.server channel')
+            }
+
+            initMap();
+
+        }
+
+        function initMap() {
+
+            //Setup Google Map
+            var myLatlng = new google.maps.LatLng(17.7850,-12.4183);
+            var light_grey_style = [{"featureType":"landscape","stylers":[{"saturation":-100},{"lightness":65},{"visibility":"on"}]},{"featureType":"poi","stylers":[{"saturation":-100},{"lightness":51},{"visibility":"simplified"}]},{"featureType":"road.highway","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"road.arterial","stylers":[{"saturation":-100},{"lightness":30},{"visibility":"on"}]},{"featureType":"road.local","stylers":[{"saturation":-100},{"lightness":40},{"visibility":"on"}]},{"featureType":"transit","stylers":[{"saturation":-100},{"visibility":"simplified"}]},{"featureType":"administrative.province","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"labels","stylers":[{"visibility":"on"},{"lightness":-25},{"saturation":-100}]},{"featureType":"water","elementType":"geometry","stylers":[{"hue":"#ffff00"},{"lightness":-25},{"saturation":-97}]}];
+            var myOptions = {
+                zoom: 2,
+                center: myLatlng,
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                mapTypeControl: true,
+                mapTypeControlOptions: {
+                    style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR,
+                    position: google.maps.ControlPosition.LEFT_BOTTOM
+                },
+                styles: light_grey_style
+            };
+
+            console.log('Instantiating map');
+            var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            console.log('Map created: ' + map);
+
+            //Setup heat map and link to Twitter array we will append data to
+            var heatmap;
+            var liveTweets = new google.maps.MVCArray();
+            heatmap = new google.maps.visualization.HeatmapLayer({
+                data: liveTweets,
+                radius: 25
+            });
+            heatmap.setMap(map);
+
+            console.log('initMap() completed');
+
+
+        }
+
+    </script>
 </head>
 <body>
 
-<script>
-    var sock = new SockJS('http://localhost:9090/happiness');
-    sock.onopen = function() {
-        console.log('open');
-    };
-    sock.onmessage = function(e) {
-        console.log('message', e.data);
-        alert('received message echoed from server: ' + e.data);
-    };
-    sock.onclose = function() {
-        console.log('close');
-    };
+<div id="map_canvas"></div>
 
-    function send(message) {
+<div id="fromserver" class="main">
+    <label for="outserver">Server:</label>
+    <br/>
+    <textarea id="outserver" rows="10" cols="200" readonly></textarea>
+</div>
 
-        if (sock.readyState === SockJS.OPEN) {
-            console.log("sending message")
-            sock.send(message);
-        } else {
-            console.log("The socket is not open.");
-        }
-    }
-</script>
-<form onsubmit="return false;">
-    <input type="textarea" rows="10" name="message" value="Hello, World!"/>
-    <input type="button" value="Send SockJS data" onclick="send(this.form.message.value)"/>
-</form>
 </body>
 </html>

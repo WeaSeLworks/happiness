@@ -1,14 +1,10 @@
 package com.github.weaselworks.happiness.twitter;
 
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.eventbus.EventBus;
-import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.sockjs.SockJSServer;
-import org.vertx.java.core.sockjs.SockJSSocket;
 import org.vertx.java.platform.Verticle;
 
 /**
@@ -19,19 +15,6 @@ public class Server extends Verticle {
     @Override
     public void start() {
 
-        final EventBus eb = vertx.eventBus();
-        eb.registerHandler("com.github.weaselworks.happiness.twitter.server", new Handler<Message<JsonObject>>() {
-
-            @Override
-            public void handle(Message<JsonObject> event) {
-
-                JsonObject o = (JsonObject) event.body();
-
-
-
-            }
-        });
-
         int port = 9090;
         HttpServer server = vertx.createHttpServer();
 
@@ -40,32 +23,40 @@ public class Server extends Verticle {
             @Override
             public void handle(HttpServerRequest req) {
 
-                // Serve up the index.html
-                if (req.path().equals("/")) req.response().sendFile("src/main/resources/web/index.html");
+                // Serve up the indexold.html
+                if (req.path().equals("/")) {
+                    req.response().sendFile("src/main/resources/web/index.html");
+                }
+
+                // Should this really need to be here?!?
+                else if (req.path().equals("/vertxbus-2.1.js")) {
+                    req.response().sendFile("src/main/resources/web/vertxbus-2.1.js");
+                }
 
             }
 
         });
 
-        // Start SockJSSever
-        SockJSServer sockServer = vertx.createSockJSServer(server);
+        JsonObject config = new JsonObject();
+        config.putString("prefix", "/eventbus");
 
-        sockServer.installApp(new JsonObject().putString("prefix", "/happiness"), new Handler<SockJSSocket>() {
+        // Allow messages in from the client
+        JsonArray inboundPermitted = new JsonArray();
+        inboundPermitted.add(new JsonObject().putString("address", "msg.client"));
 
-            @Override
-            public void handle(final SockJSSocket event) {
-                event.dataHandler(new Handler<Buffer>() {
+        // Allow messages out to the client
+        JsonArray outboundPermitted = new JsonArray();
+        outboundPermitted.add(new JsonObject().putString("address", "msg.server"));
 
-                    @Override
-                    public void handle(Buffer data) {
+        vertx.createSockJSServer(server).bridge(config, inboundPermitted, outboundPermitted);
 
-                        // Echo the message back to the client
-                        event.write(data);
-                    }
-                });
+        // Test connection by sending a heartbeat message every 5 seconds
+        long timerID = vertx.setPeriodic(5000, new Handler<Long>() {
+            public void handle(Long timerID) {
 
+                System.out.println("Sending heartbeat");
+                vertx.eventBus().send("msg.server",new JsonObject().putString("msg", "Heartbeat - timestamp at server: " + System.currentTimeMillis()));
             }
-
         });
 
         System.out.println("Happiness server is running on port " + port);
