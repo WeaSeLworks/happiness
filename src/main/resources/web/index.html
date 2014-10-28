@@ -31,6 +31,9 @@
 
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
+
+                    console.log('Message received: ' + message);
+
                     serverArea.value+=JSON.stringify(message)+'\n';
                 });
                 console.log('Registered handler for msg.server channel')

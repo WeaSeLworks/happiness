@@ -1,6 +1,9 @@
 package com.github.weaselworks.happiness.twitter;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
+import org.vertx.java.core.eventbus.EventBus;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.json.JsonArray;
@@ -25,12 +28,12 @@ public class Server extends Verticle {
 
                 // Serve up the indexold.html
                 if (req.path().equals("/")) {
-                    req.response().sendFile("src/main/resources/web/index.html");
+                    req.response().sendFile("web/index.html");
                 }
 
                 // Should this really need to be here?!?
                 else if (req.path().equals("/vertxbus-2.1.js")) {
-                    req.response().sendFile("src/main/resources/web/vertxbus-2.1.js");
+                    req.response().sendFile("web/vertxbus-2.1.js");
                 }
 
             }
@@ -51,11 +54,24 @@ public class Server extends Verticle {
         vertx.createSockJSServer(server).bridge(config, inboundPermitted, outboundPermitted);
 
         // Test connection by sending a heartbeat message every 5 seconds
-        long timerID = vertx.setPeriodic(5000, new Handler<Long>() {
-            public void handle(Long timerID) {
+//        long timerID = vertx.setPeriodic(5000, new Handler<Long>() {
+//            public void handle(Long timerID) {
+//
+//                System.out.println("Sending heartbeat");
+//                vertx.eventBus().send("msg.server",new JsonObject().putString("msg", "Heartbeat - timestamp at server: " + System.currentTimeMillis()));
+//            }
+//        });
 
-                System.out.println("Sending heartbeat");
-                vertx.eventBus().send("msg.server",new JsonObject().putString("msg", "Heartbeat - timestamp at server: " + System.currentTimeMillis()));
+        // Register a handler to listen for messages to this
+        final EventBus eb = vertx.eventBus();
+        eb.registerHandler("com.github.weaselworks.happiness.twitter.server", new Handler<Message>() {
+
+            @Override
+            public void handle(Message event) {
+
+                System.out.println("Server received message, sending to client");
+                eb.send("msg.server", event.body());
+
             }
         });
 
