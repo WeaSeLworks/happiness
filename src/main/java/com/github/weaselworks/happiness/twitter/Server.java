@@ -17,8 +17,11 @@ public class Server extends Verticle {
 
     @Override
     public void start() {
+        String portEnv = getContainer().env().get("PORT");
+        String hostEnv = getContainer().env().get("HOST");
 
-        int port = 9090;
+        int port = portEnv == null ? 9090 : Integer.parseInt(portEnv);
+        String host = hostEnv == null ? "0.0.0.0" : hostEnv;
         HttpServer server = vertx.createHttpServer();
 
         server.requestHandler(new Handler<HttpServerRequest>() {
@@ -68,15 +71,15 @@ public class Server extends Verticle {
 
             @Override
             public void handle(Message event) {
-
-                System.out.println("Server received message, sending to client");
-                eb.send("msg.server", event.body());
-
+                JsonObject tweet = (JsonObject)event.body();
+                if (tweet.getInteger("positivity") != 0) {
+                    eb.send("msg.server", event.body());
+                }
             }
         });
 
         System.out.println("Happiness server is running on port " + port);
-        server.listen(port);
+        server.listen(port, host);
 
     }
 

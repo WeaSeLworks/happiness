@@ -18,7 +18,6 @@
             console.log('In init() innit');
 
             // get the elements
-            var serverArea = document.getElementById('outserver');
 
             // Get a handle to the eventbus
             var eb = new vertx.EventBus('http://localhost:9090/eventbus');
@@ -32,9 +31,12 @@
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
 
-                    console.log('Message received: ' + message);
+                    console.log(JSON.stringify(message));
 
-                    serverArea.value+=JSON.stringify(message)+'\n';
+                    $('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
+                    if ($('#tweets p').length >20) {
+                        $('#tweets p:last').remove();
+                    }
                 });
                 console.log('Registered handler for msg.server channel')
             }
@@ -85,9 +87,8 @@
 <div id="map_canvas"></div>
 
 <div id="fromserver" class="main">
-    <label for="outserver">Server:</label>
-    <br/>
-    <textarea id="outserver" rows="10" cols="200" readonly></textarea>
+    <label for="tweets">Tweets with greater than zero positivity: </label>
+    <div id="tweets"></div>
 </div>
 
 </body>
