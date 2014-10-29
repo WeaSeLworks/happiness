@@ -28,6 +28,11 @@ public class TwitterVerticle extends BusModBase {
 
     TwitterStream twitterStream = null;
 
+    private static final String CONSUMER_KEY = System.getenv("CONSUMER_KEY");
+    private static final String CONSUMER_SECRET = System.getenv("CONSUMER_SECRET");
+    private static final String ACCESS_KEY = System.getenv("ACCESS_KEY");
+    private static final String ACCESS_SECRET = System.getenv("ACCESS_SECRET");
+
     public void start() {
         super.start();
 
@@ -47,8 +52,15 @@ public class TwitterVerticle extends BusModBase {
             }
         };
 
+
         ConfigurationBuilder cb = new ConfigurationBuilder();
+        cb.setDebugEnabled(true)
+                .setOAuthConsumerKey(CONSUMER_KEY)
+                .setOAuthConsumerSecret(CONSUMER_SECRET)
+                .setOAuthAccessToken(ACCESS_KEY)
+                .setOAuthAccessTokenSecret(ACCESS_SECRET);
         cb.setJSONStoreEnabled(true);
+
 
         twitterStream = new TwitterStreamFactory(cb.build()).getInstance();
         twitterStream.addListener(statusListener);

@@ -59,6 +59,10 @@ dependencies {
   compile 'org.twitter4j:twitter4j-stream:4.0.2'
   compile 'com.google.code.gson:gson:2.3'
 
+  compile 'org.slf4j:slf4j-api:1.7.7'
+  compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.1'
+
+
 }
 
 test {
