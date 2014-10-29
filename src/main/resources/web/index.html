@@ -1,23 +1,38 @@
+<!DOCTYPE html>
 <html>
 <head>
     <title>Hap-PI-ness</title>
+
+    <style type="text/css">
+        html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+
     <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
     <script src="vertxbus-2.1.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
     <!-- Google Maps -->
     <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=visualization"></script>
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDbE6pTxk-WK-iIyhfcDlWFMd3k4NGuMEw">
+    </script>
+
+    <!-- Google Maps Visualisation Library (for Heatmap Layer) -->
+    <script type="text/javascript"
+            src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false">
+    </script>
 
     <script>
+
+        var heatmap;
+        var liveTweets;
+        var map;
 
         window.onload = init;
 
         function init() {
 
             console.log('In init() innit');
-
-            // get the elements
 
             // Get a handle to the eventbus
             var eb = new vertx.EventBus('http://localhost:9090/eventbus');
@@ -31,17 +46,38 @@
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
 
-                    console.log(JSON.stringify(message));
+                    //console.log(JSON.stringify(message));
 
-                    $('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
-                    if ($('#tweets p').length >20) {
-                        $('#tweets p:last').remove();
+                    // If the message has geo data...
+                    if (null != message.coordinates) {
+
+                        // Coords are ordered long, lat
+                        var tweetLong = message.coordinates.coordinates[0];
+                        var tweetLat = message.coordinates.coordinates[1];
+
+                        console.log("Long: " + tweetLong + ", Lat: " + tweetLat);
+
+                        var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
+                        liveTweets.push(tweetLocation);
+
+                        var image = "small-dot-icon.png";
+                        var marker = new google.maps.Marker({
+                            position: tweetLocation,
+                            map: map,
+                            icon: image
+                        });
+                        setTimeout(function(){
+                            marker.setMap(null);
+                        },600);
+
                     }
+                    //$('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
+                    //if ($('#tweets p').length >20) {
+                    //    $('#tweets p:last').remove();
+                    //}
                 });
                 console.log('Registered handler for msg.server channel')
             }
-
-            initMap();
 
         }
 
@@ -63,12 +99,11 @@
             };
 
             console.log('Instantiating map');
-            var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+            map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
             console.log('Map created: ' + map);
 
-            //Setup heat map and link to Twitter array we will append data to
-            var heatmap;
-            var liveTweets = new google.maps.MVCArray();
+            // Initialise heat map and link to Twitter array we will append data to
+            liveTweets = new google.maps.MVCArray();
             heatmap = new google.maps.visualization.HeatmapLayer({
                 data: liveTweets,
                 radius: 25
@@ -79,17 +114,17 @@
 
 
         }
-
+        google.maps.event.addDomListener(window, 'load', initMap);
     </script>
 </head>
 <body>
 
-<div id="map_canvas"></div>
+<div id="map_canvas" style="height: 80%"></div>
 
-<div id="fromserver" class="main">
+<!--div id="fromserver" class="main">
     <label for="tweets">Tweets with greater than zero positivity: </label>
     <div id="tweets"></div>
-</div>
+</div-->
 
 </body>
 </html>

@@ -39,6 +39,10 @@ public class Server extends Verticle {
                     req.response().sendFile("web/vertxbus-2.1.js");
                 }
 
+                else if (req.path().equals("/small-dot-icon.png")) {
+                    req.response().sendFile("web/small-dot-icon.png");
+                }
+
             }
 
         });
