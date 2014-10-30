@@ -38,7 +38,7 @@ public class Server extends Verticle {
             @Override
             public void handle(HttpServerRequest req) {
 
-                // Serve up the indexold.html
+                // Serve up the index.html
                 if (req.path().equals("/")) {
                     req.response().sendFile("web/index.html");
                 }
