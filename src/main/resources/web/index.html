@@ -35,7 +35,7 @@
             console.log('In init() innit');
 
             // Get a handle to the eventbus
-            var eb = new vertx.EventBus('http://'+window.location.hostname+'/eventbus');
+            var eb = new vertx.EventBus(window.location+'eventbus');
             console.log('Got event bus handle');
 
             // When the eventbus is ready, register a listener
