@@ -28,7 +28,7 @@ public class LanguageDetect extends Verticle {
         Handler<Message<JsonObject> > languageDetectHandler = new Handler<Message<JsonObject> >() {
             public void handle(Message<JsonObject>  message) {
 
-                logger.info("message received "+message.body());
+                logger.debug("message received "+message.body());
 
                 JsonObject jo = message.body();
 

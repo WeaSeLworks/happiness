@@ -1,5 +1,6 @@
 package com.github.weaselworks.happiness.twitter;
 
+import org.slf4j.Logger;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
@@ -15,13 +16,21 @@ import org.vertx.java.platform.Verticle;
  */
 public class Server extends Verticle {
 
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(TwitterVerticle.class);
+
+
     @Override
     public void start() {
+
+        logger.info("STARTING HTTP SERVER *******************");
+
         String portEnv = getContainer().env().get("PORT");
         String hostEnv = getContainer().env().get("HOST");
 
+        logger.info("Port ="+portEnv);
+        logger.info("Host ="+hostEnv);
         int port = portEnv == null ? 9090 : Integer.parseInt(portEnv);
-        String host = hostEnv == null ? "0.0.0.0" : hostEnv;
+        String host = hostEnv ==null ? "0.0.0.0" : hostEnv;
         HttpServer server = vertx.createHttpServer();
 
         server.requestHandler(new Handler<HttpServerRequest>() {
