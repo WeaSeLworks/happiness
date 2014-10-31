@@ -110,3 +110,8 @@ def configurePom(def pom) {
     }
   }
 }
+
+task push(type:Exec, dependsOn: ['compileJava', 'modZip']) {
+    commandLine 'cf', 'push'
+}
+

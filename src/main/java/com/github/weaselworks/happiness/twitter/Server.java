@@ -28,7 +28,6 @@ public class Server extends Verticle {
         String hostEnv = getContainer().env().get("HOST");
 
         logger.info("Port ="+portEnv);
-        logger.info("Host ="+hostEnv);
         int port = portEnv == null ? 9090 : Integer.parseInt(portEnv);
         String host = hostEnv ==null ? "0.0.0.0" : hostEnv;
         HttpServer server = vertx.createHttpServer();
