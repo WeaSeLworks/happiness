@@ -54,11 +54,12 @@
                         // Coords are ordered long, lat
                         var tweetLong = message.coordinates.coordinates[0];
                         var tweetLat = message.coordinates.coordinates[1];
+                        var positivity = parseInt(message.positivity);
 
-                        console.log("Long: " + tweetLong + ", Lat: " + tweetLat);
+                        //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Positivity: " + positivity);
 
+                        // Construct the tweet location and briefly plot it
                         var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
-                        liveTweets.push(tweetLocation);
 
                         var image = "small-dot-icon.png";
                         var marker = new google.maps.Marker({
@@ -69,6 +70,12 @@
                         setTimeout(function(){
                             marker.setMap(null);
                         },600);
+
+                        // Now construct a weighted location based on the positivity score
+                        // and push that to the heatmap
+                        var weightedLocation = {location: tweetLocation, weight: positivity};
+                        liveTweets.push(weightedLocation);
+
 
                     }
                     //$('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
