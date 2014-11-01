@@ -1,6 +1,0 @@
-applications:
-- name: happiness114 
-  path : build/libs/happiness-1.0.0-final.zip
-  buildpack: https://github.com/WeaSeLworks/vertx-buildpack.git 
-  instances: 1
-  mem: 1024

@@ -1,0 +1,12 @@
+applications:
+- name: $applicationName
+  path : libs/happiness-1.0.0-final.zip
+  buildpack: https://github.com/WeaSeLworks/vertx-buildpack.git 
+  instances: 1
+  mem: 1024
+  env:
+    CONSUMER_KEY: $consumerKey
+    CONSUMER_SECRET: $consumerSecret
+    ACCESS_KEY: $accessKey
+    ACCESS_SECRET: $accessSecret
+
