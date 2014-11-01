@@ -9,4 +9,5 @@ applications:
     CONSUMER_SECRET: $consumerSecret
     ACCESS_KEY: $accessKey
     ACCESS_SECRET: $accessSecret
+  command: vertx runmod raspberryPi~$applicationName~1
 
