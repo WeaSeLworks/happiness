@@ -51,6 +51,16 @@ public class Server extends Verticle {
                     req.response().sendFile("web/small-dot-icon.png");
                 }
 
+                else if (req.path().equals("/gmaps-heatmap.js")) {
+                    req.response().sendFile("web/gmaps-heatmap.js");
+                }
+
+                else if (req.path().equals("/heatmap.js")) {
+                    req.response().sendFile("web/heatmap.js");
+                }
+
+
+
             }
 
         });
@@ -84,7 +94,7 @@ public class Server extends Verticle {
             @Override
             public void handle(Message event) {
                 JsonObject tweet = (JsonObject)event.body();
-                if (tweet.getInteger("positivity") != 0) {
+                if (tweet.getInteger("sentimentScore") != 0) {
                     eb.send("msg.server", event.body());
                 }
             }

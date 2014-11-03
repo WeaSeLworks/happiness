@@ -13,14 +13,13 @@
 
     <!-- Google Maps -->
     <link href="https://google-developers.appspot.com/maps/documentation/javascript/examples/default.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js">
-    </script>
 
     <!-- Google Maps Visualisation Library (for Heatmap Layer) -->
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false">
     </script>
-
+    <script src="heatmap.js"></script>
+    <script src="gmaps-heatmap.js"></script>
     <script>
 
         var heatmap;
@@ -53,9 +52,13 @@
                         // Coords are ordered long, lat
                         var tweetLong = message.coordinates.coordinates[0];
                         var tweetLat = message.coordinates.coordinates[1];
-                        var positivity = parseInt(message.positivity);
+                        var sentimentScore = parseInt(message.sentimentScore);
 
-                        //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Positivity: " + positivity);
+                        //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", SentimentScore: " + sentimentScore);
+
+                        //if (sentimentScore < 0) {
+                        //    console.log("Negative tweet: " + sentimentScore);
+                        //}
 
                         // Construct the tweet location and briefly plot it
                         var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
@@ -72,9 +75,17 @@
 
                         // Now construct a weighted location based on the positivity score
                         // and push that to the heatmap
-                        var weightedLocation = {location: tweetLocation, weight: positivity};
-                        liveTweets.push(weightedLocation);
+                        //var weightedLocation = {location: tweetLocation, weight: sentimentScore};
+                        //liveTweets.push(weightedLocation);
 
+                        // Construct a HeatMap.js data point and add it
+                        var dataPoint = {
+                            lat: tweetLat, // x coordinate of the datapoint, a number
+                            lng: tweetLong, // y coordinate of the datapoint, a number
+                            sentimentScore: sentimentScore // the value at datapoint(x, y)
+                        };
+
+                        heatmap.addData(dataPoint);
 
                     }
                     //$('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
@@ -110,11 +121,33 @@
 
             // Initialise heat map and link to Twitter array we will append data to
             liveTweets = new google.maps.MVCArray();
-            heatmap = new google.maps.visualization.HeatmapLayer({
-                data: liveTweets,
-                radius: 25
-            });
-            heatmap.setMap(map);
+            //heatmap = new google.maps.visualization.HeatmapLayer({
+            //    data: liveTweets,
+            //    radius: 25
+            //});
+            //heatmap.setMap(map);
+
+            // HeatMap.js heatmap layer
+            heatmap = new HeatmapOverlay(map,
+                    {
+                        // radius should be small ONLY if scaleRadius is true (or small radius is intended)
+                        "radius": 2,
+                        "maxOpacity": 1,
+                        // scales the radius based on map zoom
+                        "scaleRadius": true,
+                        // if set to false the heatmap uses the global maximum for colorization
+                        // if activated: uses the data maximum within the current map boundaries
+                        //   (there will always be a red spot with useLocalExtremas true)
+                        "useLocalExtrema": true,
+                        // which field name in your data represents the latitude - default "lat"
+                        latField: 'lat',
+                        // which field name in your data represents the longitude - default "lng"
+                        lngField: 'lng',
+                        // which field name in your data represents the data value - default "value"
+                        valueField: 'sentimentScore'
+                    }
+            );
+
 
             console.log('initMap() completed');
 
