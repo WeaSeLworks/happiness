@@ -11,6 +11,9 @@ import org.vertx.java.platform.Verticle;
 import twitter4j.Status;
 import twitter4j.TwitterObjectFactory;
 
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.LANGUAGE_DETECT__ADDRESS;
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_ANALYSER_ADDRESS;
+
 /**
  * Created by steve on 27/10/2014.
  */
@@ -42,13 +45,13 @@ public class LanguageDetect extends Verticle {
                 //}
                 //else{
                     //publish to the sentiment analyser
-                eb.publish("com.github.weaselworks.happiness.sentimentanalyser", jo);
+                eb.publish(SENTIMENT_ANALYSER_ADDRESS, jo);
                 //}
 
             }
         };
 
-        eb.registerHandler("com.github.weaselworks.happiness.languagedetect", languageDetectHandler);
+        eb.registerHandler(LANGUAGE_DETECT__ADDRESS, languageDetectHandler);
 
     }
 }

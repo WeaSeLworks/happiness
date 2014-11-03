@@ -11,6 +11,8 @@ import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.*;
+
 /**
  * Created by nick on 25/10/2014.
  */
@@ -70,11 +72,11 @@ public class Server extends Verticle {
 
         // Allow messages in from the client
         JsonArray inboundPermitted = new JsonArray();
-        inboundPermitted.add(new JsonObject().putString("address", "msg.client"));
+        inboundPermitted.add(new JsonObject().putString("address", SERVER_CLIENT_INBOUND_ADDRESS));
 
         // Allow messages out to the client
         JsonArray outboundPermitted = new JsonArray();
-        outboundPermitted.add(new JsonObject().putString("address", "msg.server"));
+        outboundPermitted.add(new JsonObject().putString("address", SERVER_CLIENT_OUTBOUND_ADDRESS));
 
         vertx.createSockJSServer(server).bridge(config, inboundPermitted, outboundPermitted);
 
@@ -89,13 +91,13 @@ public class Server extends Verticle {
 
         // Register a handler to listen for messages to this
         final EventBus eb = vertx.eventBus();
-        eb.registerHandler("com.github.weaselworks.happiness.twitter.server", new Handler<Message>() {
+        eb.registerHandler(SERVER_ADDRESS, new Handler<Message>() {
 
             @Override
             public void handle(Message event) {
                 JsonObject tweet = (JsonObject)event.body();
-                if (tweet.getInteger("sentimentScore") != 0) {
-                    eb.send("msg.server", event.body());
+                if (tweet.getInteger(SENTIMENT_SCORE_PROPERTY) != 0) {
+                    eb.send(SERVER_CLIENT_OUTBOUND_ADDRESS, event.body());
                 }
             }
         });

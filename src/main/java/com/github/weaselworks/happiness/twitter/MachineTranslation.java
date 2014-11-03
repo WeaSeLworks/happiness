@@ -7,6 +7,8 @@ import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.platform.Verticle;
 
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.*;
+
 /**
  * Created by steve on 27/10/2014.
  */
@@ -29,13 +31,13 @@ public class MachineTranslation extends Verticle {
                 //append the translated text as an additional property
 
 
-                eb.publish("com.github.weaselworks.happiness.sentimentanalyser", message);
+                eb.publish(SENTIMENT_ANALYSER_ADDRESS, message);
 
 
             }
         };
 
-        eb.registerHandler("com.github.weaselworks.happiness.machinetranslation", machineTranslationHandler);
+        eb.registerHandler(MACHINE_TRANSLATION_ADDRESS, machineTranslationHandler);
 
     }
 }
