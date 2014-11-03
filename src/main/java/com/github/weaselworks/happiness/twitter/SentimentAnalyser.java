@@ -33,11 +33,11 @@ public class SentimentAnalyser extends Verticle {
                 try{
 
                     SentimentalJ sj = new SentimentalJ();
-                    Sentiment s = sj.positivity(message.body().getString("text"));
+                    Sentiment s = sj.analyze(message.body().getString("text"));
 
                     JsonObject jo = message.body();
 
-                    jo.putNumber("positivity", s.getScore());
+                    jo.putNumber("sentimentScore", s.getComparative());
 
                     eb.publish("com.github.weaselworks.happiness.twitter.server", jo);
 
