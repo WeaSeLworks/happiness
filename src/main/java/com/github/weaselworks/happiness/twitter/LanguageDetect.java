@@ -11,7 +11,7 @@ import org.vertx.java.platform.Verticle;
 import twitter4j.Status;
 import twitter4j.TwitterObjectFactory;
 
-import static com.github.weaselworks.happiness.twitter.HappinessConstants.LANGUAGE_DETECT__ADDRESS;
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.LANGUAGE_DETECT_ADDRESS;
 import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_ANALYSER_ADDRESS;
 
 /**
@@ -51,7 +51,7 @@ public class LanguageDetect extends Verticle {
             }
         };
 
-        eb.registerHandler(LANGUAGE_DETECT__ADDRESS, languageDetectHandler);
+        eb.registerHandler(LANGUAGE_DETECT_ADDRESS, languageDetectHandler);
 
     }
 }
