@@ -24,6 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_ANALYSER_ADDRESS;
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.MACHINE_TRANSLATION_ADDRESS;
+
 /**
  * Created by steve on 27/10/2014.
  */
@@ -144,13 +147,13 @@ public class MachineTranslation extends Verticle {
 
 
 
-                eb.publish("com.github.weaselworks.happiness.sentimentanalyser", message);
+                eb.publish(SENTIMENT_ANALYSER_ADDRESS, message);
 
 
             }
         };
 
-        eb.registerHandler("com.github.weaselworks.happiness.machinetranslation", machineTranslationHandler);
+        eb.registerHandler(MACHINE_TRANSLATION_ADDRESS, machineTranslationHandler);
 
     }
 

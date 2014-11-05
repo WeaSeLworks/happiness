@@ -17,6 +17,8 @@ import twitter4j.auth.AccessToken;
 import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.json.DataObjectFactory;
 
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.LANGUAGE_DETECT_ADDRESS;
+
 
 /**
  * Created by paul on 25/10/2014.
@@ -47,7 +49,7 @@ public class TwitterVerticle extends BusModBase {
 
                 JsonObject jo = new JsonObject(statusJson);
 
-                eb.publish("com.github.weaselworks.happiness.languagedetect", jo);
+                eb.publish(LANGUAGE_DETECT_ADDRESS, jo);
 
             }
         };

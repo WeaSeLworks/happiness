@@ -18,8 +18,6 @@
     <script type="text/javascript"
             src="https://maps.googleapis.com/maps/api/js?libraries=visualization&sensor=true_or_false">
     </script>
-    <script src="heatmap.js"></script>
-    <script src="gmaps-heatmap.js"></script>
     <script>
 
         var heatmap;
@@ -35,6 +33,7 @@
             // Get a handle to the eventbus
             var eb = new vertx.EventBus(window.location+'eventbus');
             console.log('Got event bus handle');
+            var image = "small-dot-icon.png";
 
             // When the eventbus is ready, register a listener
             eb.onopen = function() {
@@ -54,16 +53,21 @@
                         var tweetLat = message.coordinates.coordinates[1];
                         var sentimentScore = parseInt(message.sentimentScore);
 
+                        // TODO: Temporary fix because Google HeatmapLayer
+                        // doesn't seem to handle negative weightings
+                        if (sentimentScore < 0) {
+                            sentimentScore = 0;
+                        }
+
                         //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", SentimentScore: " + sentimentScore);
 
                         //if (sentimentScore < 0) {
                         //    console.log("Negative tweet: " + sentimentScore);
-                        //}
+                        // }
 
                         // Construct the tweet location and briefly plot it
                         var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
 
-                        var image = "small-dot-icon.png";
                         var marker = new google.maps.Marker({
                             position: tweetLocation,
                             map: map,
@@ -71,21 +75,12 @@
                         });
                         setTimeout(function(){
                             marker.setMap(null);
-                        },600);
+                        }, 50);
 
                         // Now construct a weighted location based on the positivity score
                         // and push that to the heatmap
-                        //var weightedLocation = {location: tweetLocation, weight: sentimentScore};
-                        //liveTweets.push(weightedLocation);
-
-                        // Construct a HeatMap.js data point and add it
-                        var dataPoint = {
-                            lat: tweetLat, // x coordinate of the datapoint, a number
-                            lng: tweetLong, // y coordinate of the datapoint, a number
-                            sentimentScore: sentimentScore // the value at datapoint(x, y)
-                        };
-
-                        heatmap.addData(dataPoint);
+                        var weightedLocation = {location: tweetLocation, weight: sentimentScore};
+                        liveTweets.push(weightedLocation);
 
                     }
                     //$('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
@@ -121,33 +116,12 @@
 
             // Initialise heat map and link to Twitter array we will append data to
             liveTweets = new google.maps.MVCArray();
-            //heatmap = new google.maps.visualization.HeatmapLayer({
-            //    data: liveTweets,
-            //    radius: 25
-            //});
-            //heatmap.setMap(map);
-
-            // HeatMap.js heatmap layer
-            heatmap = new HeatmapOverlay(map,
-                    {
-                        // radius should be small ONLY if scaleRadius is true (or small radius is intended)
-                        "radius": 2,
-                        "maxOpacity": 1,
-                        // scales the radius based on map zoom
-                        "scaleRadius": true,
-                        // if set to false the heatmap uses the global maximum for colorization
-                        // if activated: uses the data maximum within the current map boundaries
-                        //   (there will always be a red spot with useLocalExtremas true)
-                        "useLocalExtrema": true,
-                        // which field name in your data represents the latitude - default "lat"
-                        latField: 'lat',
-                        // which field name in your data represents the longitude - default "lng"
-                        lngField: 'lng',
-                        // which field name in your data represents the data value - default "value"
-                        valueField: 'sentimentScore'
-                    }
-            );
-
+            heatmap = new google.maps.visualization.HeatmapLayer({
+                data: liveTweets,
+                radius: 10,
+                maxIntensity: 100
+            });
+            heatmap.setMap(map);
 
             console.log('initMap() completed');
 
