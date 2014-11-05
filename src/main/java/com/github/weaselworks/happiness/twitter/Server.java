@@ -42,29 +42,10 @@ public class Server extends Verticle {
                 String path = req.path();
 
                 // Serve up the index.html
-                if (path.equals("/small-dot-icon.png")) {
-                    System.out.println("Dot requested");
-                    req.response().sendFile("web/small-dot-icon.png");
-                }
-
-                else if (path.equals("/")) {
+                if (path.equals("/")) {
                     req.response().sendFile("web/index.html");
                 }
-
-                // Should this really need to be here?!?
-                else if (path.equals("/vertxbus-2.1.js")) {
-                    req.response().sendFile("web/vertxbus-2.1.js");
-                }
-
-                else if (path.equals("/gmaps-heatmap.js")) {
-                    req.response().sendFile("web/gmaps-heatmap.js");
-                }
-
-                else if (path.equals("/heatmap.js")) {
-                    req.response().sendFile("web/heatmap.js");
-                }
-
-
+                else req.response().sendFile("web/" + path);
 
             }
 
