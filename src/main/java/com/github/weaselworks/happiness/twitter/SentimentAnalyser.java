@@ -14,9 +14,8 @@ import twitter4j.Status;
 import twitter4j.TwitterObjectFactory;
 import uk.bl.wa.sentimentalj.Sentiment;
 import uk.bl.wa.sentimentalj.SentimentalJ;
-import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_SCORE_PROPERTY;
-import static com.github.weaselworks.happiness.twitter.HappinessConstants.SERVER_ADDRESS;
-import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_ANALYSER_ADDRESS;
+
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.*;
 
 public class SentimentAnalyser extends Verticle {
 
@@ -42,7 +41,7 @@ public class SentimentAnalyser extends Verticle {
 
                     jo.putNumber(SENTIMENT_SCORE_PROPERTY, s.getComparative());
 
-                    eb.publish(SERVER_ADDRESS, jo);
+                    eb.publish(CHOROPLETH_ADDRESS, jo);
 
                 }
                 catch(Exception e){

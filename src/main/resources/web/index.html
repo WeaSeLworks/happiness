@@ -13,8 +13,24 @@
 
     <script src="http://d3js.org/d3.v3.min.js"></script>
     <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="datamaps.all.js"></script>
+    <script src="datamaps.world.min.js"></script>
     <script>
+
+        var map;
+
+        var choroplethToKeyFillMap = {
+            "-5" : "UNHAPPY5",
+            "-4" : "UNHAPPY4",
+            "-3" : "UNHAPPY3",
+            "-2" : "UNHAPPY2",
+            "-1" : "UNHAPPY1",
+            "0"  : "NEUTRAL",
+            "1"  : "HAPPY1",
+            "2"  : "HAPPY2",
+            "3"  : "HAPPY3",
+            "4"  : "HAPPY4",
+            "5"  : "HAPPY5"
+        }
 
         window.onload = init;
 
@@ -35,42 +51,44 @@
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
 
-                    //console.log(JSON.stringify(message));
+                    console.log(JSON.stringify(message));
 
-                    // If the message has geo data...
-                    if (null != message.coordinates) {
+                    // Coords are ordered long, lat
+                    var tweetLong = message.tweetLong;
+                    var tweetLat = message.tweetLat;
+                    var choroplethScore = message.choroplethScore;
+                    var countryCode = message.countryCode;
 
-                        // Coords are ordered long, lat
-                        var tweetLong = message.coordinates.coordinates[0];
-                        var tweetLat = message.coordinates.coordinates[1];
-                        var sentimentScore = parseInt(message.sentimentScore);
+                    //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + choroplethScore);
 
-                        //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", SentimentScore: " + sentimentScore);
+                    //if (sentimentScore < 0) {
+                    //    console.log("Negative tweet: " + sentimentScore);
+                    // }
 
-                        //if (sentimentScore < 0) {
-                        //    console.log("Negative tweet: " + sentimentScore);
-                        // }
+                    // Construct the tweet location and briefly plot it
+                    //var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
+                    var marker = [{
+                        latitude: tweetLat,
+                        longitude: tweetLong,
+                        radius: 20,
+                        fillKey: 'MARKER'
 
-                        // Construct the tweet location and briefly plot it
-                        //var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
-                        var marker = [{
-                            latitude: tweetLat,
-                            longitude: tweetLong,
-                            radius: 50,
-                            fillKey: 'MARKER'
+                    }];
+                    map.bubbles(marker);
 
-                        }];
-                        map.bubbles(marker);
+                    setTimeout(function(){
+                        map.bubbles([]);
+                    }, 1);
 
-                        setTimeout(function(){
-                            map.bubbles([]);
-                        }, 50);
+                    var jsonData = {};
+                    var countryFillKey = {};
+                    countryFillKey['fillKey'] = choroplethToKeyFillMap[choroplethScore];
+                    jsonData[countryCode] = countryFillKey;
 
-                    }
-                    //$('#tweets').prepend('<p>'+message.user.screen_name+': '+message.positivity+'</p>');
-                    //if ($('#tweets p').length >20) {
-                    //    $('#tweets p:last').remove();
-                    //}
+                    console.log("Data: " + JSON.stringify(jsonData));
+                    map.updateChoropleth(jsonData);
+
+
                 });
                 console.log('Registered handler for msg.server channel')
             }
@@ -83,31 +101,31 @@
 
 <div id="container" style="position: relative; height: 90%;"></div>
 <script>
-    var map = new Datamap({
+    map = new Datamap({
         element: document.getElementById('container'),
         fills: {
-            HIGH: '#afafaf',
-            LOW: '#123456',
-            MEDIUM: 'blue',
-            UNKNOWN: 'rgb(0,0,0)',
-            MARKER: 'red',
-            defaultFill: 'black'
-        }/*,
+            "MARKER": 'red',
+            "UNHAPPY5": 'rgb(165,0,38)',
+            "UNHAPPY4": 'rgb(215,48,39)',
+            "UNHAPPY3": 'rgb(244,109,67)',
+            "UNHAPPY2": 'rgb(253,174,97)',
+            "UNHAPPY1": 'rgb(254,224,139)',
+            "NEUTRAL": 'rgb(255,255,191)',
+            "HAPPY1": 'rgb(217,239,139)',
+            "HAPPY2": 'rgb(166,217,106)',
+            "HAPPY3": 'rgb(102,189,99)',
+            "HAPPY4": 'rgb(26,152,80)',
+            "HAPPY5": 'rgb(0,104,55)'
+
+        },
         data: {
-            IRL: {
-                fillKey: 'HIGH',
-                numberOfThings: 2002
-            },
-            USA: {
-                fillKey: 'MEDIUM',
-                numberOfThings: 10381
-            }
-        }*/
+        }
 
     });
 
     //draw a legend for this map
     map.legend();
+
 </script>
 
 

@@ -70,8 +70,10 @@ dependencies {
 
     compile 'org.apache.commons:commons-lang3:3.3.2'
     compile 'commons-codec:commons-codec:1.9'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'ch.qos.logback:logback-core:1.1.2'
 
-
+    testCompile 'junit:junit:4.11'
 
 }
 

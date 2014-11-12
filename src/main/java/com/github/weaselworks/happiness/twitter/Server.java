@@ -79,10 +79,13 @@ public class Server extends Verticle {
 
             @Override
             public void handle(Message event) {
-                JsonObject tweet = (JsonObject)event.body();
-                if (tweet.getInteger(SENTIMENT_SCORE_PROPERTY) != 0) {
-                    eb.send(SERVER_CLIENT_OUTBOUND_ADDRESS, event.body());
-                }
+
+//                JsonObject tweet = (JsonObject)event.body();
+//                if (tweet.getInteger(SENTIMENT_SCORE_PROPERTY) != 0) {
+//                    eb.send(SERVER_CLIENT_OUTBOUND_ADDRESS, event.body());
+//                }
+
+                eb.send(SERVER_CLIENT_OUTBOUND_ADDRESS, event.body());
             }
         });
 

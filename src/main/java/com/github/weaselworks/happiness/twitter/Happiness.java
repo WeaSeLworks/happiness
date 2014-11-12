@@ -14,6 +14,8 @@ public class Happiness extends Verticle {
         getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.MachineTranslation");
         getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.SentimentAnalyser");
         getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.Server");
+        getContainer().deployVerticle("com.github.weaselworks.happiness.twitter.Choropleth");
+
 
     }
 }
