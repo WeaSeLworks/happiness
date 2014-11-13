@@ -51,7 +51,7 @@
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
 
-                    console.log(JSON.stringify(message));
+                    //console.log(JSON.stringify(message));
 
                     // Coords are ordered long, lat
                     var tweetLong = message.tweetLong;
@@ -74,18 +74,18 @@
                         fillKey: 'MARKER'
 
                     }];
-                    map.bubbles(marker);
+                    //map.bubbles(marker);
 
                     setTimeout(function(){
                         map.bubbles([]);
-                    }, 1);
+                    }, 10);
 
                     var jsonData = {};
                     var countryFillKey = {};
                     countryFillKey['fillKey'] = choroplethToKeyFillMap[choroplethScore];
                     jsonData[countryCode] = countryFillKey;
 
-                    console.log("Data: " + JSON.stringify(jsonData));
+                    //console.log("Data: " + JSON.stringify(jsonData));
                     map.updateChoropleth(jsonData);
 
 

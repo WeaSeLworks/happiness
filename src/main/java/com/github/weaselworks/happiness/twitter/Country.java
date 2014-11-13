@@ -5,15 +5,15 @@ package com.github.weaselworks.happiness.twitter;
  */
 public class Country {
 
-    private double totalScore;
-    private long numReadings;
+    private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Country.class);
+
+    private Number currentAverage = 0;
     private String code;
 
-    public Country(String alpha3Code, double score) {
+    public Country(String alpha3Code, Number score) {
 
         this.code = alpha3Code;
-        this.totalScore = score;
-        this.numReadings = 1;
+        this.currentAverage = score;
 
     }
 
@@ -21,18 +21,14 @@ public class Country {
         return code;
     }
 
-    public double getAverageScore() {
+    public void updateAverage(Number score) {
 
-        return totalScore / numReadings;
+        currentAverage = (currentAverage.doubleValue() + score.doubleValue()) / 2;
 
     }
 
-    public void addScore(double score) {
-        totalScore += score;
-        numReadings++;
+    public Number getCurrentAverage() {
+        return currentAverage;
     }
-
-
-
 
 }

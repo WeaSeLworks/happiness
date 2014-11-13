@@ -54,58 +54,70 @@ public class Choropleth extends Verticle {
             public void handle(Message<JsonObject> message) {
 
                 org.vertx.java.core.json.JsonObject jo = message.body();
-                JsonObject outerCoordinates = jo.getField(COORDINATES_PROPERTY);
 
-                if (null != outerCoordinates) {
+                Number sentimentScore = jo.getNumber(SENTIMENT_SCORE_PROPERTY);
 
-                    JsonArray innerCoords = outerCoordinates.getField(COORDINATES_PROPERTY);
+                // Filter out sentiment scores of zero
+                //if (sentimentScore.doubleValue() != 0) {
 
+                if (true) {
+                    JsonObject outerCoordinates = jo.getField(COORDINATES_PROPERTY);
 
-                    Double tweetLong = innerCoords.get(0);
-                    Double tweetLat = innerCoords.get(1);
-                    double sentimentScore = jo.getNumber(SENTIMENT_SCORE_PROPERTY).doubleValue();
-                    //logger.info("Lat: " + tweetLat + ", Long: " + tweetLong + ", Sentiment: " + sentimentScore);
+                    if (null != outerCoordinates) {
 
-                    // Reverse geocode the location to get the Alpha2 country code
-                    GeoName nearestPlace = geocode.nearestPlace(tweetLat, tweetLong);
-                    String alpha2Code = nearestPlace.country;
+                        JsonArray innerCoords = outerCoordinates.getField(COORDINATES_PROPERTY);
 
-                    // If this is the first time we've seen a tweet for this country,
-                    // create it and store it against its Alpha2 code so we don't have
-                    // to convert it every time we want to add a score
-                    Country country = null;
-                    if (!countryByAlpha2Code.containsKey(alpha2Code)) {
+                        Number tweetLong = null;
+                        Number tweetLat = null;
+                        try {
+                            tweetLong = innerCoords.get(0);
+                            tweetLat = innerCoords.get(1);
+                            //logger.info("Lat: " + tweetLat + ", Long: " + tweetLong + ", Sentiment: " + sentimentScore);
+                        }
+                        catch (ClassCastException ex) {
+                            Object tweetLongObj = innerCoords.get(0);
+                            logger.info("Type: "+ tweetLongObj.getClass());
+                            throw ex;
+                        }
 
-                        //logger.info("Creating Country for " + alpha2Code);
+                        // Reverse geocode the location to get the Alpha2 country code
+                        GeoName nearestPlace = geocode.nearestPlace(tweetLat.doubleValue(), tweetLong.doubleValue());
+                        String alpha2Code = nearestPlace.country;
 
-                        // Lookup the alpha3 code for this country and store it
-                        // for use in the presentation layer
-                        String alpha3 = countryConverter.getIsoAlpha3Code(alpha2Code);
+                        // If this is the first time we've seen a tweet for this country,
+                        // create it and store it against its Alpha2 code so we don't have
+                        // to convert it every time we want to add a score
+                        Country country = null;
+                        if (!countryByAlpha2Code.containsKey(alpha2Code)) {
 
-                        country = new Country(alpha3, sentimentScore);
-                        countryByAlpha2Code.put(alpha2Code, country);
+                            // Lookup the alpha3 code for this country and store it
+                            // for use in the presentation layer
+                            String alpha3 = countryConverter.getIsoAlpha3Code(alpha2Code);
+
+                            country = new Country(alpha3, sentimentScore);
+                            countryByAlpha2Code.put(alpha2Code, country);
+
+                        } else {
+                            country = countryByAlpha2Code.get(alpha2Code);
+                            country.updateAverage(sentimentScore);
+                        }
+
+                        long choroplethVal = calculateChoroplethValue(country.getCurrentAverage());
+
+                        logger.info("Choropleth val: " + choroplethVal);
+
+                        HashMap<String, Object> vals = new HashMap<String, Object>();
+                        vals.put(COUNTRY_CODE, country.getAlpha3Code());
+                        vals.put(CHOROPLETH_SCORE, choroplethVal);
+                        vals.put(TWEET_LAT, tweetLat);
+                        vals.put(TWEET_LONG, tweetLong);
+
+                        JsonObject json = new JsonObject(vals);
+
+                        eb.publish(SERVER_ADDRESS, json);
+
 
                     }
-                    else {
-                        country = countryByAlpha2Code.get(alpha2Code);
-                        country.addScore(sentimentScore);
-                    }
-
-                    long choroplethVal = calculateChoroplethValue(country.getAverageScore());
-
-                    logger.info("Choropleth val: " + choroplethVal);
-
-                    HashMap<String, Object> vals = new HashMap<String, Object>();
-                    vals.put(COUNTRY_CODE, country.getAlpha3Code());
-                    vals.put(CHOROPLETH_SCORE, choroplethVal);
-                    vals.put(TWEET_LAT, tweetLat);
-                    vals.put(TWEET_LONG, tweetLong);
-
-                    JsonObject json = new JsonObject(vals);
-
-                    eb.publish(SERVER_ADDRESS, json);
-
-
                 }
 
             }
@@ -115,20 +127,23 @@ public class Choropleth extends Verticle {
 
     }
 
-    private long calculateChoroplethValue(double average) {
+    private long calculateChoroplethValue(Number average) {
 
         logger.info("Calculating Choropleth Value for: " + average);
 
         long retVal = 0;
-        if (average < CHOROPLETH_MIN) {
+        if (average.doubleValue() < CHOROPLETH_MIN) {
             retVal = CHOROPLETH_MIN;
         }
-        else if (average > CHOROPLETH_MAX) {
+        else if (average.doubleValue() > CHOROPLETH_MAX) {
             retVal = CHOROPLETH_MAX;
         }
-        else retVal = Math.round(average);
+        else {
+            retVal = (long) Math.rint(average.doubleValue());
+            logger.info("After round: " + retVal);
+        }
 
-        logger.info("Retval: " + retVal);
+        //logger.info("Retval: " + retVal);
 
         return retVal;
 
