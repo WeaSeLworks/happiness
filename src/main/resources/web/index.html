@@ -51,19 +51,14 @@
                 // Register for server events
                 eb.registerHandler('msg.server', function(message) {
 
-                    //console.log(JSON.stringify(message));
-
                     // Coords are ordered long, lat
                     var tweetLong = message.tweetLong;
                     var tweetLat = message.tweetLat;
                     var choroplethScore = message.choroplethScore;
                     var countryCode = message.countryCode;
 
+                    //console.log(JSON.stringify(message));
                     //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + choroplethScore);
-
-                    //if (sentimentScore < 0) {
-                    //    console.log("Negative tweet: " + sentimentScore);
-                    // }
 
                     // Construct the tweet location and briefly plot it
                     //var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
@@ -72,13 +67,12 @@
                         longitude: tweetLong,
                         radius: 20,
                         fillKey: 'MARKER'
-
                     }];
-                    //map.bubbles(marker);
+                    map.bubbles(marker);
 
                     setTimeout(function(){
                         map.bubbles([]);
-                    }, 10);
+                    }, 100);
 
                     var jsonData = {};
                     var countryFillKey = {};
@@ -104,7 +98,7 @@
     map = new Datamap({
         element: document.getElementById('container'),
         fills: {
-            "MARKER": 'red',
+            "MARKER": 'blue',
             "UNHAPPY5": 'rgb(165,0,38)',
             "UNHAPPY4": 'rgb(215,48,39)',
             "UNHAPPY3": 'rgb(244,109,67)',
@@ -124,7 +118,7 @@
     });
 
     //draw a legend for this map
-    map.legend();
+    //map.legend();
 
 </script>
 

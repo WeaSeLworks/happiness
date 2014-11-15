@@ -55,12 +55,12 @@ public class Choropleth extends Verticle {
 
                 org.vertx.java.core.json.JsonObject jo = message.body();
 
-                Number sentimentScore = jo.getNumber(SENTIMENT_SCORE_PROPERTY);
+                int sentimentScore = jo.getInteger(SENTIMENT_SCORE_PROPERTY);
 
-                // Filter out sentiment scores of zero
-                //if (sentimentScore.doubleValue() != 0) {
 
-                if (true) {
+                // Round the sentimentScore and filter the ones at zero
+                if (sentimentScore != 0) {
+
                     JsonObject outerCoordinates = jo.getField(COORDINATES_PROPERTY);
 
                     if (null != outerCoordinates) {
