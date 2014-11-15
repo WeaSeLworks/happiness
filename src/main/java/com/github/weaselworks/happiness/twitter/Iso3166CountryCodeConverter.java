@@ -17,11 +17,9 @@ public class Iso3166CountryCodeConverter {
 
     private Map<String, String> isoAlpha2ToAlpha3 = new HashMap<String, String>();
 
-    private static String sourceFile = "src/main/resources/web/iso_3166_2_countries.csv";
-
     public Iso3166CountryCodeConverter() {
 
-        loadData(sourceFile);
+        loadData();
     }
 
     public String getIsoAlpha3Code(String alpha2Code) {
@@ -29,13 +27,15 @@ public class Iso3166CountryCodeConverter {
     }
 
 
-    private void loadData(String sourceFile) {
+    private void loadData() {
 
         BufferedReader br = null;
 
         try {
 
-            br = new BufferedReader(new FileReader(sourceFile));
+            InputStream is = this.getClass().getResourceAsStream("/web/iso_3166_2_countries.csv");
+
+            br = new BufferedReader(new InputStreamReader(is));
 
             String line = null;
 
@@ -57,10 +57,6 @@ public class Iso3166CountryCodeConverter {
                 else System.out.println("Pause");
             }
 
-        }
-        catch (FileNotFoundException ex) {
-
-            log.error("Unable to find file: " + sourceFile);
         }
         catch (IOException ex) {
             log.error("Unexpected exception in BufferedReader", ex);

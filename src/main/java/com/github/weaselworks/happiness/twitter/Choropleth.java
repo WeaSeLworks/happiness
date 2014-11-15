@@ -8,6 +8,8 @@ import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonElement;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
@@ -41,7 +43,8 @@ public class Choropleth extends Verticle {
         logger.info("The Choropleth verticle has started");
 
         try {
-            geocode = new ReverseGeoCode(new FileInputStream("src/main/resources/web/cities1000.txt"), true);
+
+            geocode = new ReverseGeoCode(Choropleth.class.getResourceAsStream("/web/cities1000.txt"), true);
             logger.info("ReverseGeoCode instantiated");
         }
         catch (IOException ex) {
@@ -72,7 +75,7 @@ public class Choropleth extends Verticle {
                         try {
                             tweetLong = innerCoords.get(0);
                             tweetLat = innerCoords.get(1);
-                            //logger.info("Lat: " + tweetLat + ", Long: " + tweetLong + ", Sentiment: " + sentimentScore);
+                            logger.info("Lat: " + tweetLat + ", Long: " + tweetLong + ", Sentiment: " + sentimentScore);
                         }
                         catch (ClassCastException ex) {
                             Object tweetLongObj = innerCoords.get(0);
