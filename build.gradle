@@ -127,7 +127,7 @@ def configurePom(def pom) {
 ext.usernamesToApps= [
         'paulwatson':'devpaul',
         'skoney': 'testEnvSteve',
-        'kenchilane': 'testenvnick'
+        'nick': 'testenvnick'
 ]
 
 task buildManifest(type: Copy) {
