@@ -18,7 +18,7 @@ import static com.github.weaselworks.happiness.twitter.HappinessConstants.*;
  */
 public class Server extends Verticle {
 
-    private final Logger logger = org.slf4j.LoggerFactory.getLogger(TwitterVerticle.class);
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(Server.class);
 
 
     @Override
