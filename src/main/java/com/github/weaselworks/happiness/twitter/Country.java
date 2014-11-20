@@ -1,9 +1,11 @@
 package com.github.weaselworks.happiness.twitter;
 
+import org.vertx.java.core.shareddata.Shareable;
+
 /**
  * Created by nick on 11/11/2014.
  */
-public class Country {
+public class Country implements Shareable {
 
     private final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(Country.class);
 

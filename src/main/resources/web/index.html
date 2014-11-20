@@ -11,26 +11,26 @@
     <script src="vertxbus-2.1.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-    <script src="http://d3js.org/d3.v3.min.js"></script>
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="datamaps.world.min.js"></script>
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <!-- Underscore.js -->
+    <script src="underscore.js"></script>
+
+    <!-- Country borders -->
+    <script src="countries.js"></script>
+
+
     <script>
 
         var map;
+        var geoJsonLayer;
 
-        var choroplethToKeyFillMap = {
-            "-5" : "UNHAPPY5",
-            "-4" : "UNHAPPY4",
-            "-3" : "UNHAPPY3",
-            "-2" : "UNHAPPY2",
-            "-1" : "UNHAPPY1",
-            "0"  : "NEUTRAL",
-            "1"  : "HAPPY1",
-            "2"  : "HAPPY2",
-            "3"  : "HAPPY3",
-            "4"  : "HAPPY4",
-            "5"  : "HAPPY5"
-        }
+        var dotIcon = L.icon({
+            iconUrl: 'small-dot-icon.png'
+        });
+
 
         window.onload = init;
 
@@ -61,27 +61,26 @@
                     //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + choroplethScore);
 
                     // Construct the tweet location and briefly plot it
-                    //var tweetLocation = new google.maps.LatLng(tweetLat, tweetLong);
-                    var marker = [{
-                        latitude: tweetLat,
-                        longitude: tweetLong,
-                        radius: 20,
-                        fillKey: 'MARKER'
-                    }];
-                    map.bubbles(marker);
+                    var marker = L.marker([tweetLat, tweetLong], {icon: dotIcon});
+                    marker.addTo(map);
+
+                    // Lookup the feature for this country and update it
+                    var feature = _.find(countryData.features,
+                        function(f) {
+                            if (f.id == countryCode) return f;
+                        });
+
+                    if (null != feature) {
+                        feature.properties.choropleth = choroplethScore;
+                    }
+                    else console.log("Country not found for: " + countryCode);
+
+                    geoJsonLayer.clearLayers(); // inherited from LayerGroup
+                    geoJsonLayer.addData(countryData);
 
                     setTimeout(function(){
-                        map.bubbles([]);
-                    }, 100);
-
-                    var jsonData = {};
-                    var countryFillKey = {};
-                    countryFillKey['fillKey'] = choroplethToKeyFillMap[choroplethScore];
-                    jsonData[countryCode] = countryFillKey;
-
-                    //console.log("Data: " + JSON.stringify(jsonData));
-                    map.updateChoropleth(jsonData);
-
+                        map.removeLayer(marker);
+                    }, 200);
 
                 });
                 console.log('Registered handler for msg.server channel')
@@ -89,36 +88,93 @@
 
         }
 
+            function getColor(d) {
+
+        var colour = (
+               d == -5 ? '#A50026' :
+               d == -4 ? '#D73027' :
+               d == -3 ? '#F46D43' :
+               d == -2 ? '#FDAE61' :
+               d == -1 ? '#FEE08B' :
+               d == 0  ? '#FFFFBF' :
+               d == 1  ? '#D9EF8B' :
+               d == 2  ? '#A6D96A' :
+               d == 3  ? '#66BD63' :
+               d == 4  ? '#1A9850' :
+               d == 5  ? '#006837' :
+                         '#cdced4');
+
+        return colour;
+    }
+
+    function style(feature) {
+
+        var choropleth = feature.properties.choropleth;
+
+        if (null == choropleth) {
+            feature.properties.choropleth = -999;
+        }
+
+        return {
+            fillColor: getColor(choropleth),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    }
+
+
     </script>
+
+    <style>
+        #map {
+        width: 100%;
+        height: 500px;
+        }
+
+        .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        }
+        .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+        }
+
+        .legend {
+        text-align: left;
+        line-height: 18px;
+        color: #555;
+        }
+        .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
 
-<div id="container" style="position: relative; height: 90%;"></div>
+<div id="map" style="position: relative; height: 90%;"></div>
 <script>
-    map = new Datamap({
-        element: document.getElementById('container'),
-        fills: {
-            "MARKER": 'blue',
-            "UNHAPPY5": 'rgb(165,0,38)',
-            "UNHAPPY4": 'rgb(215,48,39)',
-            "UNHAPPY3": 'rgb(244,109,67)',
-            "UNHAPPY2": 'rgb(253,174,97)',
-            "UNHAPPY1": 'rgb(254,224,139)',
-            "NEUTRAL": 'rgb(255,255,191)',
-            "HAPPY1": 'rgb(217,239,139)',
-            "HAPPY2": 'rgb(166,217,106)',
-            "HAPPY3": 'rgb(102,189,99)',
-            "HAPPY4": 'rgb(26,152,80)',
-            "HAPPY5": 'rgb(0,104,55)'
 
-        },
-        data: {
-        }
+    map = L.map('map').setView([0,0], 2);
 
-    });
+     L.tileLayer('http://{s}.tiles.mapbox.com/v3/weaselworks.k8m9ipef/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18
+    }).addTo(map);
 
-    //draw a legend for this map
-    //map.legend();
+
+    geoJsonLayer = L.geoJson(countryData, {style: style}).addTo(map);
 
 </script>
 

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 
 import com.github.weaselworks.happiness.geocode.ReverseGeoCode;
 import com.github.weaselworks.happiness.geocode.GeoName;
@@ -33,18 +34,18 @@ public class Choropleth extends Verticle {
     private Iso3166CountryCodeConverter countryConverter = new Iso3166CountryCodeConverter();
     private ReverseGeoCode geocode;
 
-    private Map<String, Country> countryByAlpha2Code = new HashMap<String, Country>();
+    private ConcurrentMap<String, Country> countryByAlpha2Code;
 
     @Override
     public void start() {
 
         final EventBus eb = vertx.eventBus();
-
+        countryByAlpha2Code = vertx.sharedData().getMap("choropleth.countryCodes");
         logger.info("The Choropleth verticle has started");
 
         try {
 
-            geocode = new ReverseGeoCode(Choropleth.class.getResourceAsStream("/web/cities1000.txt"), true);
+            geocode = new ReverseGeoCode(Choropleth.class.getResourceAsStream("/web/cities15000.txt"), true);
             logger.info("ReverseGeoCode instantiated");
         }
         catch (IOException ex) {
@@ -101,6 +102,7 @@ public class Choropleth extends Verticle {
                             countryByAlpha2Code.put(alpha2Code, country);
 
                         } else {
+                            logger.info("Country: " + alpha2Code + " found");
                             country = countryByAlpha2Code.get(alpha2Code);
                             country.updateAverage(sentimentScore);
                         }

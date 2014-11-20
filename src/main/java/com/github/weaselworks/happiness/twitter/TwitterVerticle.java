@@ -18,6 +18,7 @@ import twitter4j.conf.ConfigurationBuilder;
 import twitter4j.json.DataObjectFactory;
 
 import static com.github.weaselworks.happiness.twitter.HappinessConstants.LANGUAGE_DETECT_ADDRESS;
+import static com.github.weaselworks.happiness.twitter.HappinessConstants.SENTIMENT_ANALYSER_ADDRESS;
 
 
 /**
@@ -49,7 +50,7 @@ public class TwitterVerticle extends BusModBase {
 
                 JsonObject jo = new JsonObject(statusJson);
 
-                eb.publish(LANGUAGE_DETECT_ADDRESS, jo);
+                eb.publish(SENTIMENT_ANALYSER_ADDRESS, jo);
 
             }
         };
