@@ -11,7 +11,7 @@
         body {
         margin: 0;
         padding: 0;
-        background: #000000 url(/globe/loading.gif) center center no-repeat;
+        background: #000000 url(globe/loading.gif) center center no-repeat;
         color: #ffffff;
         font-family: sans-serif;
         font-size: 11px;
@@ -105,7 +105,7 @@
         position: relative;
         bottom: 0px;
         left: 0px;
-        background: url(/globe/ce.png);
+        background: url(ce.png);
         }
 
         #layer1 {
@@ -207,13 +207,15 @@
                         divisor = -5;
                     }
 
-                        var dt = [tweetLat, tweetLong, (displayScore / divisor), 2];
-                        console.log(dt);
+                    // Spike size is between 0 and 1
+                    // (for dots, hardcode to 0.0001)
+                    var spikeSize = displayScore / divisor;
 
-                        globe.addData(dt, {format: 'legend'});
-
-                        globe.createPoints();
-                        globe.animate();
+                    // Create new data point: Lat, Long, Magnitude, Colour
+                    // NB Colour corresponds to the colour position in an array
+                    var dt = [tweetLat, tweetLong, spikeSize, displayScore];
+                    globe.addData(dt, {format: 'legend'});
+                    globe.createPoints();
 
 
                 });
@@ -232,26 +234,14 @@
 <div id="container" style="color: rgb(255, 255, 255); font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 13px; line-height: 20px; font-family: Arial, sans-serif; cursor: move;"></div>
 
 
-<script type="text/javascript" src="/globe/third-party/three.min.js"></script>
-<script type="text/javascript" src="/globe/globe.js"></script>
+<script type="text/javascript" src="globe/third-party/three.min.js"></script>
+<script type="text/javascript" src="globe/globe.js"></script>
 <script type="text/javascript">
 
-  globe = DAT.Globe(document.getElementById('container'), function(label) {
-    return new THREE.Color([
-      0xd9d9d9, 0xb6b4b5, 0x9966cc, 0x15adff, 0x3e66a3,
-      0x216288, 0xff7e7e, 0xff1f13, 0xc0120b, 0x5a1301, 0xffcc02,
-      0xedb113, 0x9fce66, 0x0c9a39,
-      0xfe9872, 0x7f3f98, 0xf26522, 0x2bb673, 0xd7df23,
-      0xe6b23a, 0x7ed3f7][label]);
-  });
-
   // Create globe and override spike colours
-  //globe = DAT.Globe(document.getElementById('container'), {colorFn: function(label) {
-  //  return new THREE.Color([
-  //    0xA50026, 0xD73027, 0xF46D43, 0xFDAE61, 0xFEE08B,
-  //    0xD9EF8B, 0xA6D96A, 0x66BD63, 0x1A9850, 0x006837][label]);
-  //});
+  globe = DAT.Globe(document.getElementById('container'));
 
+  globe.animate();
 
   document.body.style.backgroundImage = 'none'; // remove loading
 

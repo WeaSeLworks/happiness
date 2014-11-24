@@ -16,11 +16,33 @@ var DAT = DAT || {};
 DAT.Globe = function(container, opts) {
   opts = opts || {};
   
-  var colorFn = opts.colorFn || function(x) {
-    var c = new THREE.Color();
-    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
+  //var colorFn = opts.colorFn || function(x) {
+  //  var c = new THREE.Color();
+  //  c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
+  //  return c;
+  //};
+
+  var colorFn = function(x) {
+
+    var c = (
+           x == -5 ? new THREE.Color('#A50026') :
+           x == -4 ? new THREE.Color('#D73027') :
+           x == -3 ? new THREE.Color('#F46D43') :
+           x == -2 ? new THREE.Color('#FDAE61') :
+           x == -1 ? new THREE.Color('#FEE08B') :
+           x == 0  ? new THREE.Color('#FFFFBF') :
+           x == 1  ? new THREE.Color('#D9EF8B') :
+           x == 2  ? new THREE.Color('#A6D96A') :
+           x == 3  ? new THREE.Color('#66BD63') :
+           x == 4  ? new THREE.Color('#1A9850') :
+           x == 5  ? new THREE.Color('#006837') :
+                     new THREE.Color('#cdced4'));
+
+    console.log("x: " + x + ", returning " + c);
     return c;
-  };
+
+  }
+
   var imgDir = opts.imgDir || '/globe/';
 
   var Shaders = {
@@ -177,7 +199,11 @@ DAT.Globe = function(container, opts) {
       colorFnWrapper = function(data, i) { return colorFn(data[i+2]); }
     } else if (opts.format === 'legend') {
       step = 4;
-      colorFnWrapper = function(data, i) { return colorFn(data[i+3]); }
+      colorFnWrapper = function(data, i) {
+
+        console.log("Getting color " + data[i+3]);
+        return colorFn(data[i+3]);
+      }
     } else {
       throw('error: format not supported: '+opts.format);
     }
