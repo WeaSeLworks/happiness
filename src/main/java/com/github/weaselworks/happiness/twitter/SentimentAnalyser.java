@@ -41,7 +41,7 @@ public class SentimentAnalyser extends Verticle {
 
                     jo.putNumber(SENTIMENT_SCORE_PROPERTY, s.getComparative());
 
-                    eb.publish(CHOROPLETH_ADDRESS, jo);
+                    eb.publish(GLOBE_ADDRESS, jo);
 
                 }
                 catch(Exception e){

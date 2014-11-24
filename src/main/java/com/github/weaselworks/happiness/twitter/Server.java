@@ -43,7 +43,7 @@ public class Server extends Verticle {
 
                 // Serve up the index.html
                 if (path.equals("/")) {
-                    req.response().sendFile("web/index.html");
+                    req.response().sendFile("web/webgl.html");
                 }
                 else req.response().sendFile("web/" + path);
 

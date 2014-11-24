@@ -1,19 +1,13 @@
 package com.github.weaselworks.happiness.twitter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonElement;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 
 import com.github.weaselworks.happiness.geocode.ReverseGeoCode;
@@ -137,11 +131,11 @@ public class Choropleth extends Verticle {
         logger.info("Calculating Choropleth Value for: " + average);
 
         long retVal = 0;
-        if (average.doubleValue() < CHOROPLETH_MIN) {
-            retVal = CHOROPLETH_MIN;
+        if (average.doubleValue() < DISPLAY_MIN) {
+            retVal = DISPLAY_MIN;
         }
-        else if (average.doubleValue() > CHOROPLETH_MAX) {
-            retVal = CHOROPLETH_MAX;
+        else if (average.doubleValue() > DISPLAY_MAX) {
+            retVal = DISPLAY_MAX;
         }
         else {
             retVal = (long) Math.rint(average.doubleValue());

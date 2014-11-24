@@ -11,6 +11,7 @@ public class HappinessConstants {
     public static final String MACHINE_TRANSLATION_ADDRESS = "com.github.weaselworks.happiness.machinetranslation";
     public static final String SERVER_ADDRESS = "com.github.weaselworks.happiness.twitter.server";
     public static final String CHOROPLETH_ADDRESS = "com.github.weaselworks.happiness.choropleth";
+    public static final String GLOBE_ADDRESS = "com.github.weaselworks.happiness.globe";
 
     // Socket Channels
     public static final String SERVER_CLIENT_OUTBOUND_ADDRESS = "msg.server";
@@ -24,9 +25,9 @@ public class HappinessConstants {
     public static final String TWEET_LAT = "tweetLat";
     public static final String TWEET_LONG = "tweetLong";
 
-    // Choropleth Values
-    public static final int CHOROPLETH_MIN = -5;
-    public static final int CHOROPLETH_MAX = 5;
+    // Display Values
+    public static final int DISPLAY_MIN = -5;
+    public static final int DISPLAY_MAX = 5;
 
 
 }
