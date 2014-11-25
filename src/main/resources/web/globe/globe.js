@@ -38,7 +38,7 @@ DAT.Globe = function(container, opts) {
            x == 5  ? new THREE.Color('#006837') :
                      new THREE.Color('#cdced4'));
 
-    console.log("x: " + x + ", returning " + c);
+    //console.log("x: " + x + ", returning " + c);
     return c;
 
   }
@@ -193,15 +193,13 @@ DAT.Globe = function(container, opts) {
     opts.animated = opts.animated || false;
     this.is_animated = opts.animated;
     opts.format = opts.format || 'magnitude'; // other option is 'legend'
-    console.log(opts.format);
+    //console.log(opts.format);
     if (opts.format === 'magnitude') {
       step = 3;
       colorFnWrapper = function(data, i) { return colorFn(data[i+2]); }
     } else if (opts.format === 'legend') {
       step = 4;
       colorFnWrapper = function(data, i) {
-
-        console.log("Getting color " + data[i+3]);
         return colorFn(data[i+3]);
       }
     } else {

@@ -166,10 +166,14 @@
     <!-- Underscore.js -->
     <script src="underscore.js"></script>
 
+    <!-- jQuery and extensions for mouse simulation -->
+    <script src="jquery-1.11.1.min.js"></script>
+    <script src="jquery.simulate.js"></script>
+    <script src="jquery.simulate.ext.js"></script>
+    <script src="jquery.simulate.drag-n-drop.js"></script>
 
     <script>
 
-        var map;
         var globe;
 
         window.onload = init;
@@ -197,7 +201,7 @@
                     var displayScore = message.choroplethScore;
 
                     //console.log(JSON.stringify(message));
-                    console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + displayScore);
+                    //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + displayScore);
 
                     var divisor;
                     if (displayScore > 0) {
@@ -209,7 +213,8 @@
 
                     // Spike size is between 0 and 1
                     // (for dots, hardcode to 0.0001)
-                    var spikeSize = displayScore / divisor;
+                    var spikeSize = Math.abs(displayScore) / 5;
+                    //var spikeSize = 0.0001;
 
                     // Create new data point: Lat, Long, Magnitude, Colour
                     // NB Colour corresponds to the colour position in an array
@@ -224,6 +229,50 @@
 
         }
 
+
+
+    </script>
+
+    <script>
+
+        var dragDx = 100;
+
+        // onPose function for use by Chrome driver
+        // Respond to a remote pose.  The pose will be a string that’s one of the
+        //following: fist, fingerspread, wavein,waveout,thumbtopinky
+        function onPose(pose) {
+
+            console.log('In onPose, ' + pose);
+
+            if (pose == 'fist') {
+                console.log("Fist received");
+            }
+            else if (pose == 'fingerspread') {
+                console.log("Spread received");
+            }
+            else if (pose == 'wavein') {
+                console.log("WaveIn received");
+                simulateDrag(-dragDx);
+            }
+            else if (pose == 'waveout') {
+                console.log("WaveOut received");
+                simulateDrag(dragDx);
+            }
+            else if (pose == 'thumbtopinky') {
+                console.log("ThumbToPinky received");
+            }
+
+        }
+
+        function simulateDrag(dx) {
+            $('#container').simulate("drag-n-drop", {dx: dx});
+        }
+
+        function simulateMouseWheel(dx) {
+
+            var e = jQuery.Event( "DOMMouseScroll", {delta: 650} );
+            $('#container').trigger( e );
+        }
     </script>
 
 
@@ -231,7 +280,7 @@
 </head>
 <body>
 
-<div id="container" style="color: rgb(255, 255, 255); font-style: normal; font-variant: normal; font-weight: normal; font-stretch: normal; font-size: 13px; line-height: 20px; font-family: Arial, sans-serif; cursor: move;"></div>
+<div id="container" style="height:90%"></div>
 
 
 <script type="text/javascript" src="globe/third-party/three.min.js"></script>
@@ -247,6 +296,9 @@
 
 </script>
 
+<input type="button" value="Drag Left" onclick="simulateDrag(-dragDx);"/>
+<input type="button" value="Drag Right" onclick="simulateDrag(dragDx);" />
+<input type="button" value="Zoom In" onclick="simulateMouseWheel(dragDx);" />
 
 </body>
 
