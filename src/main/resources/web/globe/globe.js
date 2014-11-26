@@ -25,7 +25,21 @@ DAT.Globe = function(container, opts) {
   var imgDir = opts.imgDir || '/globe/';
 
   var texture = imgDir + (opts.texture || 'world.jpg');
-  console.log("Texture: " + texture);
+  //console.log("Texture: " + texture);
+
+  // Set up earth rotation if switched on
+  var rotateEarth = opts.rotateEarth || false;
+  console.log("rotateEarth: " + rotateEarth);
+
+  if (rotateEarth) {
+  		setInterval('moveEarth()', 10);
+  }
+
+  // Define function to rotate the earth
+  moveEarth = function() {
+    target.x -= 0.0005;
+  }
+
 
   var Shaders = {
     'earth' : {

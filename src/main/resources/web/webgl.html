@@ -304,7 +304,7 @@
   var texture = 'raw-bathymetry.jpg';
 
   // Create globe and override spike colours
-  globe = DAT.Globe(document.getElementById('container'), {colorFn: myColourFn, imgDir: imgDir, texture: texture});
+  globe = DAT.Globe(document.getElementById('container'), {colorFn: myColourFn, imgDir: imgDir, texture: texture, rotateEarth: true});
   globe.animate();
 
   document.body.style.backgroundImage = 'none'; // remove loading
