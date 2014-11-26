@@ -16,34 +16,16 @@ var DAT = DAT || {};
 DAT.Globe = function(container, opts) {
   opts = opts || {};
   
-  //var colorFn = opts.colorFn || function(x) {
-  //  var c = new THREE.Color();
-  //  c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
-  //  return c;
-  //};
-
-  var colorFn = function(x) {
-
-    var c = (
-           x == -5 ? new THREE.Color('#A50026') :
-           x == -4 ? new THREE.Color('#D73027') :
-           x == -3 ? new THREE.Color('#F46D43') :
-           x == -2 ? new THREE.Color('#FDAE61') :
-           x == -1 ? new THREE.Color('#FEE08B') :
-           x == 0  ? new THREE.Color('#FFFFBF') :
-           x == 1  ? new THREE.Color('#D9EF8B') :
-           x == 2  ? new THREE.Color('#A6D96A') :
-           x == 3  ? new THREE.Color('#66BD63') :
-           x == 4  ? new THREE.Color('#1A9850') :
-           x == 5  ? new THREE.Color('#006837') :
-                     new THREE.Color('#cdced4'));
-
-    //console.log("x: " + x + ", returning " + c);
+  var colorFn = opts.colorFn || function(x) {
+    var c = new THREE.Color();
+    c.setHSL( ( 0.6 - ( x * 0.5 ) ), 1.0, 0.5 );
     return c;
-
-  }
+  };
 
   var imgDir = opts.imgDir || '/globe/';
+
+  var texture = imgDir + (opts.texture || 'world.jpg');
+  console.log("Texture: " + texture);
 
   var Shaders = {
     'earth' : {
@@ -126,7 +108,7 @@ DAT.Globe = function(container, opts) {
     shader = Shaders['earth'];
     uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
-    uniforms['texture'].value = THREE.ImageUtils.loadTexture(imgDir+'world.jpg');
+    uniforms['texture'].value = THREE.ImageUtils.loadTexture(texture);
 
     material = new THREE.ShaderMaterial({
 

@@ -65,6 +65,7 @@ public class Globe extends Verticle {
                         vals.put(CHOROPLETH_SCORE, displayVal);
                         vals.put(TWEET_LAT, tweetLat);
                         vals.put(TWEET_LONG, tweetLong);
+                        vals.put(TWEET_TEXT, jo.getField(TEXT_PROPERTY));
 
                         JsonObject json = new JsonObject(vals);
 

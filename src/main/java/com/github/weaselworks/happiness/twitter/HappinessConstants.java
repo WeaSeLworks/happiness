@@ -20,10 +20,12 @@ public class HappinessConstants {
     // Json Message Properties
     public static final String SENTIMENT_SCORE_PROPERTY = "sentimentScore";
     public static final String COORDINATES_PROPERTY = "coordinates";
+    public static final String TEXT_PROPERTY = "text";
     public static final String COUNTRY_CODE = "countryCode";
     public static final String CHOROPLETH_SCORE = "choroplethScore";
     public static final String TWEET_LAT = "tweetLat";
     public static final String TWEET_LONG = "tweetLong";
+    public static final String TWEET_TEXT = "tweetText";
 
     // Display Values
     public static final int DISPLAY_MIN = -5;

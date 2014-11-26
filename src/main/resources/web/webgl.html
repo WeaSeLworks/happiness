@@ -11,7 +11,7 @@
         body {
         margin: 0;
         padding: 0;
-        background: #000000 url(globe/loading.gif) center center no-repeat;
+        background: #000000 url(loading.gif) center center no-repeat;
         color: #ffffff;
         font-family: sans-serif;
         font-size: 11px;
@@ -163,9 +163,6 @@
     <script src="vertxbus-2.1.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-    <!-- Underscore.js -->
-    <script src="underscore.js"></script>
-
     <!-- jQuery and extensions for mouse simulation -->
     <script src="jquery-1.11.1.min.js"></script>
     <script src="jquery.simulate.js"></script>
@@ -199,17 +196,10 @@
                     var tweetLong = message.tweetLong;
                     var tweetLat = message.tweetLat;
                     var displayScore = message.choroplethScore;
+                    var tweetText = message.tweetText;
 
                     //console.log(JSON.stringify(message));
                     //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + displayScore);
-
-                    var divisor;
-                    if (displayScore > 0) {
-                        divisor = 5;
-                    }
-                    else if (displayScore < 0) {
-                        divisor = -5;
-                    }
 
                     // Spike size is between 0 and 1
                     // (for dots, hardcode to 0.0001)
@@ -222,26 +212,19 @@
                     globe.addData(dt, {format: 'legend'});
                     globe.createPoints();
 
-
+                    $("input:text").val(tweetText);
                 });
                 console.log('Registered handler for msg.server channel')
             }
 
         }
 
-                function simulateMouseWheel(dx) {
-            globe.zoom(dx);
-            //var e = jQuery.Event( "DOMMouseScroll", {delta: 650} );
-            //$('#container').trigger( e );
-        }
-
-
-
     </script>
 
     <script>
 
-        var dragDx = 100;
+        var dragDx = 300;
+        var zoomDx = 100;
 
         // onPose function for use by Chrome driver
         // Respond to a remote pose.  The pose will be a string that’s one of the
@@ -252,9 +235,11 @@
 
             if (pose == 'fist') {
                 console.log("Fist received");
+                zoom(zoomDx);
             }
             else if (pose == 'fingerspread') {
                 console.log("Spread received");
+                zoom(-zoomDx);
             }
             else if (pose == 'wavein') {
                 console.log("WaveIn received");
@@ -274,6 +259,31 @@
             $('#container').simulate("drag-n-drop", {dx: dx});
         }
 
+        function zoom(dx) {
+            globe.zoom(dx);
+        }
+
+        // Define colour function to pass into globe options
+        var myColourFn = function(x) {
+
+            var c = (
+                   x == -5 ? new THREE.Color('#A50026') :
+                   x == -4 ? new THREE.Color('#D73027') :
+                   x == -3 ? new THREE.Color('#F46D43') :
+                   x == -2 ? new THREE.Color('#FDAE61') :
+                   x == -1 ? new THREE.Color('#FEE08B') :
+                   x == 0  ? new THREE.Color('#FFFFBF') :
+                   x == 1  ? new THREE.Color('#D9EF8B') :
+                   x == 2  ? new THREE.Color('#A6D96A') :
+                   x == 3  ? new THREE.Color('#66BD63') :
+                   x == 4  ? new THREE.Color('#1A9850') :
+                   x == 5  ? new THREE.Color('#006837') :
+                             new THREE.Color('#cdced4'));
+
+            //console.log("myColourFn - x: " + x + ", returning " + c);
+            return c;
+
+        }
 
     </script>
 
@@ -282,25 +292,31 @@
 </head>
 <body>
 
-<div id="container" style="height:90%"></div>
+<div id="container" style="height:90%;background-image:url('/globe/texture/stars.png')"></div>
 
 
-<script type="text/javascript" src="globe/third-party/three.min.js"></script>
+<script type="text/javascript" src="globe/three.min.js"></script>
 <script type="text/javascript" src="globe/globe.js"></script>
 <script type="text/javascript">
 
-  // Create globe and override spike colours
-  globe = DAT.Globe(document.getElementById('container'));
 
+  var imgDir = '/globe/texture/';
+  var texture = 'raw-bathymetry.jpg';
+
+  // Create globe and override spike colours
+  globe = DAT.Globe(document.getElementById('container'), {colorFn: myColourFn, imgDir: imgDir, texture: texture});
   globe.animate();
 
   document.body.style.backgroundImage = 'none'; // remove loading
 
 </script>
 
-<input type="button" value="Drag Left" onclick="simulateDrag(-dragDx);"/>
-<input type="button" value="Drag Right" onclick="simulateDrag(dragDx);" />
-<input type="button" value="Zoom In" onclick="simulateMouseWheel(dragDx);" />
+<input type="button" value="Drag Left" onclick="onPose('wavein');"/>
+<input type="button" value="Drag Right" onclick="onPose('waveout');" />
+<input type="button" value="Zoom In" onclick="onPose('fist');" />
+<input type="button" value="Zoom Out" onclick="onPose('fingerspread');" />
+<p/>
+<input id="tweet" type="text" style="width:100%" value="" />
 
 </body>
 
