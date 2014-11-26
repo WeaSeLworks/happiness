@@ -362,6 +362,8 @@ DAT.Globe = function(container, opts) {
     renderer.setSize( container.offsetWidth, container.offsetHeight );
   }
 
+this.zoom = zoom;
+
   function zoom(delta) {
     distanceTarget -= delta;
     distanceTarget = distanceTarget > 1000 ? 1000 : distanceTarget;

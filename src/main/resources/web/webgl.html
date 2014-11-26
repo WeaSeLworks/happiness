@@ -229,6 +229,12 @@
 
         }
 
+                function simulateMouseWheel(dx) {
+            globe.zoom(dx);
+            //var e = jQuery.Event( "DOMMouseScroll", {delta: 650} );
+            //$('#container').trigger( e );
+        }
+
 
 
     </script>
@@ -268,11 +274,7 @@
             $('#container').simulate("drag-n-drop", {dx: dx});
         }
 
-        function simulateMouseWheel(dx) {
 
-            var e = jQuery.Event( "DOMMouseScroll", {delta: 650} );
-            $('#container').trigger( e );
-        }
     </script>
 
 
