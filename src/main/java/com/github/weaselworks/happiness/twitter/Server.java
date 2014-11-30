@@ -2,7 +2,6 @@ package com.github.weaselworks.happiness.twitter;
 
 import org.slf4j.Logger;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.eventbus.EventBus;
 import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.http.HttpServer;
@@ -41,9 +40,9 @@ public class Server extends Verticle {
 
                 String path = req.path();
 
-                // Serve up the index.html
+                // Serve up the chloropleth.html
                 if (path.equals("/")) {
-                    req.response().sendFile("web/webgl.html");
+                    req.response().sendFile("web/index.html");
                 }
                 else req.response().sendFile("web/" + path);
 

@@ -29,7 +29,7 @@ modZip - creates the module zip into build/libs
 
 clean - cleans everything up
 
-test - runs the tests. An nice html test report is created in build/reports/tests (index.html)
+test - runs the tests. An nice html test report is created in build/reports/tests (chloropleth.html)
 
 runMod - runs the module. This is similar to executing vertx runmod from the command line except that it does
          not use the version of Vert.x installed and on the PATH to run it. Instead it uses the version of Vert.x

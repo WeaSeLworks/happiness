@@ -1,36 +1,177 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
 <head>
     <title>Hap-PI-ness</title>
-
+    <meta charset="utf-8">
     <style type="text/css">
-        html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+        html {
+        height: 100%;
+        }
+
+        body {
+        margin: 0;
+        padding: 0;
+        background: #000000 url(loading.gif) center center no-repeat;
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 11px;
+        line-height: 14px;
+        height: 100%;
+        }
+
+        #info {
+
+        font-size: 11px;
+        position: absolute;
+        bottom: 5px;
+        background-color: rgba(0, 0, 0, 0.8);
+        border-radius: 3px;
+        right: 10px;
+        padding: 5px;
+
+        }
+
+        a {
+        color: #04BAE3;
+        text-decoration: none;
+        }
+
+        a:hover {
+        text-decoration: underline;
+        }
+
+        .bull {
+        padding: 0px 5px;
+        color: #555;
+        }
+
+        #title {
+        position: relative;
+        top: 20px;
+        width: 250px;
+        left: 20px;
+        background-color: rgba(0, 0, 0, 0.0);
+        font: 14px/5px Georgia;
+        padding: 5px;
+        }
+
+        #locationInfo {
+        position: relative;
+        top: 20px;
+        width: 250px;
+        left: 20px;
+        background-color: rgba(0, 0, 0, 0.0);
+        font: 14px/5px Georgia;
+        padding: 5px;
+        }
+
+        .titletxt {
+        position: absolute;
+        top: 20px;
+        width: 250px;
+        left: 20px;
+        background-color: rgba(0, 0, 0, 0.0);
+        font: 11px/2px Georgia;
+        padding: 5px;
+        }
+
+        .year {
+
+        font: 11px Georgia;
+        line-height: 1px;
+        height: 30px;
+        text-align: center;
+        float: left;
+        width: 90px;
+        color: rgba(255, 255, 255, 0.4);
+
+        cursor: pointer;
+        -webkit-transition: all 0.1s ease-out;
+        }
+
+        .year:hover, .year.active {
+        font-size: 23px;
+        color: #fff;
+        }
+
+        #ce span {
+        display: none;
+        }
+
+        #ce {
+        width: 107px;
+        height: 55px;
+        display: block;
+        position: relative;
+        bottom: 0px;
+        left: 0px;
+        background: url(ce.png);
+        }
+
+        #layer1 {
+        font: 11px/8px Georgia;
+        visibility : visible;
+        position : relative;
+        }
+
+        #layer2 {
+        font: 13px/14px Georgia;
+        visibility : hidden;
+        position : absolute;
+        }
+
+        #eur1 {
+        font: 11px/8px Georgia;
+        visibility : visible;
+        position : relative;
+        }
+
+        #eur2 {
+        font: 13px/14px Georgia;
+        visibility : hidden;
+        position : absolute;
+        }
+
+        #sam1 {
+        font: 11px/8px Georgia;
+        visibility : visible;
+        position : relative;
+        }
+
+        #sam2 {
+        font: 13px/14px Georgia;
+        visibility : hidden;
+        position : absolute;
+        }
+
+        #afr1 {
+        font: 11px/8px Georgia;
+        visibility : visible;
+        position : relative;
+        }
+
+        #afr2 {
+        font: 13px/14px Georgia;
+        visibility : hidden;
+        position : absolute;
+        }
+
+
     </style>
 
     <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
-    <script src="vertxbus-2.1.js"></script>
+    <script src="js/vertxbus-2.1.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 
-    <!-- Leaflet -->
-    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
-    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-
-    <!-- Underscore.js -->
-    <script src="underscore.js"></script>
-
-    <!-- Country borders -->
-    <script src="countries.js"></script>
-
+    <!-- jQuery and extensions for mouse simulation -->
+    <script src="js/jquery-1.11.1.min.js"></script>
+    <script src="js/jquery.simulate.js"></script>
+    <script src="js/jquery.simulate.ext.js"></script>
+    <script src="js/jquery.simulate.drag-n-drop.js"></script>
 
     <script>
 
-        var map;
-        var geoJsonLayer;
-
-        var dotIcon = L.icon({
-            iconUrl: 'small-dot-icon.png'
-        });
-
+        var globe;
 
         window.onload = init;
 
@@ -54,130 +195,129 @@
                     // Coords are ordered long, lat
                     var tweetLong = message.tweetLong;
                     var tweetLat = message.tweetLat;
-                    var choroplethScore = message.choroplethScore;
-                    var countryCode = message.countryCode;
+                    var displayScore = message.choroplethScore;
+                    var tweetText = message.tweetText;
 
                     //console.log(JSON.stringify(message));
-                    //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + choroplethScore);
+                    //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + displayScore);
 
-                    // Construct the tweet location and briefly plot it
-                    var marker = L.marker([tweetLat, tweetLong], {icon: dotIcon});
-                    marker.addTo(map);
+                    // Spike size is between 0 and 1
+                    // (for dots, hardcode to 0.0001)
+                    var spikeSize = Math.abs(displayScore) / 5;
+                    //var spikeSize = 0.0001;
 
-                    // Lookup the feature for this country and update it
-                    var feature = _.find(countryData.features,
-                        function(f) {
-                            if (f.id == countryCode) return f;
-                        });
+                    // Create new data point: Lat, Long, Magnitude, Colour
+                    // NB Colour corresponds to the colour position in an array
+                    var dt = [tweetLat, tweetLong, spikeSize, displayScore];
+                    globe.addData(dt, {format: 'legend'});
+                    globe.createPoints();
 
-                    if (null != feature) {
-                        feature.properties.choropleth = choroplethScore;
-                    }
-                    else console.log("Country not found for: " + countryCode);
-
-                    geoJsonLayer.clearLayers(); // inherited from LayerGroup
-                    geoJsonLayer.addData(countryData);
-
-                    setTimeout(function(){
-                        map.removeLayer(marker);
-                    }, 200);
-
+                    $("input:text").val(tweetText);
                 });
                 console.log('Registered handler for msg.server channel')
             }
 
         }
 
-            function getColor(d) {
+    </script>
 
-        var colour = (
-               d == -5 ? '#A50026' :
-               d == -4 ? '#D73027' :
-               d == -3 ? '#F46D43' :
-               d == -2 ? '#FDAE61' :
-               d == -1 ? '#FEE08B' :
-               d == 0  ? '#FFFFBF' :
-               d == 1  ? '#D9EF8B' :
-               d == 2  ? '#A6D96A' :
-               d == 3  ? '#66BD63' :
-               d == 4  ? '#1A9850' :
-               d == 5  ? '#006837' :
-                         '#cdced4');
+    <script>
 
-        return colour;
-    }
+        var dragDx = 75;
+        var zoomDx = 100;
 
-    function style(feature) {
+        // onPose function for use by Chrome driver
+        // Respond to a remote pose.  The pose will be a string that’s one of the
+        //following: fist, fingerspread, wavein,waveout,thumbtopinky
+        function onPose(pose) {
 
-        var choropleth = feature.properties.choropleth;
+            console.log('In onPose, ' + pose);
 
-        if (null == choropleth) {
-            feature.properties.choropleth = -999;
+            if (pose == 'fist') {
+                console.log("Fist received");
+                zoom(zoomDx);
+            }
+            else if (pose == 'fingersspread') {
+                console.log("Spread received");
+                zoom(-zoomDx);
+            }
+            else if (pose == 'wavein') {
+                console.log("WaveIn received");
+                simulateDrag(-dragDx);
+            }
+            else if (pose == 'waveout') {
+                console.log("WaveOut received");
+                simulateDrag(dragDx);
+            }
+            else if (pose == 'thumbtopinky') {
+                console.log("ThumbToPinky received");
+            }
+
         }
 
-        return {
-            fillColor: getColor(choropleth),
-            weight: 2,
-            opacity: 1,
-            color: 'white',
-            dashArray: '3',
-            fillOpacity: 0.7
-        };
-    }
+        function simulateDrag(dx) {
+            $('#container').simulate("drag-n-drop", {dx: dx});
+        }
 
+        function zoom(dx) {
+            globe.zoom(dx);
+        }
+
+        // Define colour function to pass into globe options
+        var myColourFn = function(x) {
+
+            var c = (
+                   x == -5 ? new THREE.Color('#A50026') :
+                   x == -4 ? new THREE.Color('#D73027') :
+                   x == -3 ? new THREE.Color('#F46D43') :
+                   x == -2 ? new THREE.Color('#FDAE61') :
+                   x == -1 ? new THREE.Color('#FEE08B') :
+                   x == 0  ? new THREE.Color('#FFFFBF') :
+                   x == 1  ? new THREE.Color('#D9EF8B') :
+                   x == 2  ? new THREE.Color('#A6D96A') :
+                   x == 3  ? new THREE.Color('#66BD63') :
+                   x == 4  ? new THREE.Color('#1A9850') :
+                   x == 5  ? new THREE.Color('#006837') :
+                             new THREE.Color('#cdced4'));
+
+            //console.log("myColourFn - x: " + x + ", returning " + c);
+            return c;
+
+        }
 
     </script>
 
-    <style>
-        #map {
-        width: 100%;
-        height: 500px;
-        }
 
-        .info {
-        padding: 6px 8px;
-        font: 14px/16px Arial, Helvetica, sans-serif;
-        background: white;
-        background: rgba(255,255,255,0.8);
-        box-shadow: 0 0 15px rgba(0,0,0,0.2);
-        border-radius: 5px;
-        }
-        .info h4 {
-        margin: 0 0 5px;
-        color: #777;
-        }
 
-        .legend {
-        text-align: left;
-        line-height: 18px;
-        color: #555;
-        }
-        .legend i {
-        width: 18px;
-        height: 18px;
-        float: left;
-        margin-right: 8px;
-        opacity: 0.7;
-        }
-    </style>
 </head>
 <body>
 
-<div id="map" style="position: relative; height: 90%;"></div>
-<script>
-
-    map = L.map('map').setView([0,0], 2);
-
-     L.tileLayer('http://{s}.tiles.mapbox.com/v3/weaselworks.k8m9ipef/{z}/{x}/{y}.png', {
-        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        maxZoom: 18
-    }).addTo(map);
+<div id="container" style="height:90%;background-image:url('/globe/texture/galaxy_starfield.png')"></div>
 
 
-    geoJsonLayer = L.geoJson(countryData, {style: style}).addTo(map);
+<script type="text/javascript" src="globe/three.min.js"></script>
+<script type="text/javascript" src="globe/globe.js"></script>
+<script type="text/javascript">
+
+
+  var imgDir = '/globe/texture/';
+  var texture = 'raw-bathymetry.jpg';
+
+  // Create globe and override spike colours
+  globe = DAT.Globe(document.getElementById('container'), {colorFn: myColourFn, imgDir: imgDir, texture: texture, rotateEarth: true});
+  globe.animate();
+
+  document.body.style.backgroundImage = 'none'; // remove loading
 
 </script>
 
+<input type="button" value="Drag Left" onclick="onPose('wavein');"/>
+<input type="button" value="Drag Right" onclick="onPose('waveout');" />
+<input type="button" value="Zoom In" onclick="onPose('fist');" />
+<input type="button" value="Zoom Out" onclick="onPose('fingerspread');" />
+<p/>
+<input id="tweet" type="text" style="width:100%" value="" />
 
 </body>
+
 </html>

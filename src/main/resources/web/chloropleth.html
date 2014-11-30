@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hap-PI-ness</title>
+
+    <style type="text/css">
+        html, body, #map-canvas { height: 100%; margin: 0; padding: 0;}
+    </style>
+
+    <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+    <script src="js/vertxbus-2.1.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+
+    <!-- Underscore.js -->
+    <script src="underscore.js"></script>
+
+    <!-- Country borders -->
+    <script src="countries.js"></script>
+
+
+    <script>
+
+        var map;
+        var geoJsonLayer;
+
+        var dotIcon = L.icon({
+            iconUrl: 'small-dot-icon.png'
+        });
+
+
+        window.onload = init;
+
+        function init() {
+
+            console.log('In init() innit');
+
+            // Get a handle to the eventbus
+            var eb = new vertx.EventBus(window.location+'eventbus');
+            console.log('Got event bus handle');
+            var image = "small-dot-icon.png";
+
+            // When the eventbus is ready, register a listener
+            eb.onopen = function() {
+
+                console.log('Socket to vert.x EventBus opened');
+
+                // Register for server events
+                eb.registerHandler('msg.server', function(message) {
+
+                    // Coords are ordered long, lat
+                    var tweetLong = message.tweetLong;
+                    var tweetLat = message.tweetLat;
+                    var choroplethScore = message.choroplethScore;
+                    var countryCode = message.countryCode;
+
+                    //console.log(JSON.stringify(message));
+                    //console.log("Lat: " + tweetLat + ", Long: " + tweetLong + ", Score: " + choroplethScore);
+
+                    // Construct the tweet location and briefly plot it
+                    var marker = L.marker([tweetLat, tweetLong], {icon: dotIcon});
+                    marker.addTo(map);
+
+                    // Lookup the feature for this country and update it
+                    var feature = _.find(countryData.features,
+                        function(f) {
+                            if (f.id == countryCode) return f;
+                        });
+
+                    if (null != feature) {
+                        feature.properties.choropleth = choroplethScore;
+                    }
+                    else console.log("Country not found for: " + countryCode);
+
+                    geoJsonLayer.clearLayers(); // inherited from LayerGroup
+                    geoJsonLayer.addData(countryData);
+
+                    setTimeout(function(){
+                        map.removeLayer(marker);
+                    }, 200);
+
+                });
+                console.log('Registered handler for msg.server channel')
+            }
+
+        }
+
+            function getColor(d) {
+
+        var colour = (
+               d == -5 ? '#A50026' :
+               d == -4 ? '#D73027' :
+               d == -3 ? '#F46D43' :
+               d == -2 ? '#FDAE61' :
+               d == -1 ? '#FEE08B' :
+               d == 0  ? '#FFFFBF' :
+               d == 1  ? '#D9EF8B' :
+               d == 2  ? '#A6D96A' :
+               d == 3  ? '#66BD63' :
+               d == 4  ? '#1A9850' :
+               d == 5  ? '#006837' :
+                         '#cdced4');
+
+        return colour;
+    }
+
+    function style(feature) {
+
+        var choropleth = feature.properties.choropleth;
+
+        if (null == choropleth) {
+            feature.properties.choropleth = -999;
+        }
+
+        return {
+            fillColor: getColor(choropleth),
+            weight: 2,
+            opacity: 1,
+            color: 'white',
+            dashArray: '3',
+            fillOpacity: 0.7
+        };
+    }
+
+
+    </script>
+
+    <style>
+        #map {
+        width: 100%;
+        height: 500px;
+        }
+
+        .info {
+        padding: 6px 8px;
+        font: 14px/16px Arial, Helvetica, sans-serif;
+        background: white;
+        background: rgba(255,255,255,0.8);
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+        border-radius: 5px;
+        }
+        .info h4 {
+        margin: 0 0 5px;
+        color: #777;
+        }
+
+        .legend {
+        text-align: left;
+        line-height: 18px;
+        color: #555;
+        }
+        .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map" style="position: relative; height: 90%;"></div>
+<script>
+
+    map = L.map('map').setView([0,0], 2);
+
+     L.tileLayer('http://{s}.tiles.mapbox.com/v3/weaselworks.k8m9ipef/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+        maxZoom: 18
+    }).addTo(map);
+
+
+    geoJsonLayer = L.geoJson(countryData, {style: style}).addTo(map);
+
+</script>
+
+
+</body>
+</html>
