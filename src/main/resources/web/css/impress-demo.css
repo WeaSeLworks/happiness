@@ -234,6 +234,17 @@ a:focus {
     3D positioning along Z axis.
 */
 
+#intro {
+    width: 900px;
+    text-align: center;
+    padding-bottom: 500px;
+    background-size: 900px;
+    background-image: url('/images/happiness.png');
+    dbackground-position: bottom right;
+    background-repeat: no-repeat;
+
+}
+
 #title {
     padding: 0;
 }
