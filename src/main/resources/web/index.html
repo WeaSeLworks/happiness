@@ -11,7 +11,7 @@
         body {
         margin: 0;
         padding: 0;
-        background: #000000 url(loading.gif) center center no-repeat;
+        background: #000000 url(images/loading.gif) center center no-repeat;
         color: #ffffff;
         font-family: sans-serif;
         font-size: 11px;
@@ -158,6 +158,7 @@
 
 
     </style>
+    <link rel="stylesheet" href="css/animate.min.css">
 
     <script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
     <script src="js/vertxbus-2.1.js"></script>
@@ -172,6 +173,9 @@
     <script>
 
         var globe;
+
+        // Define animate.css animation class
+        var animationClass = 'animated fadeInDown';
 
         window.onload = init;
 
@@ -212,7 +216,15 @@
                     globe.addData(dt, {format: 'legend'});
                     globe.createPoints();
 
-                    $("input:text").val(tweetText);
+                    // Update the input with the tweet text
+                    $('input:text').val(tweetText);
+
+                    // Uncomment the 4 lines below for text animation
+                    //$('input:text').addClass(animationClass);
+                    //$('input:text').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function() {
+                    //    $('input:text').removeClass(animationClass);
+                    //});
+
                 });
                 console.log('Registered handler for msg.server channel')
             }
@@ -316,8 +328,9 @@
 <input type="button" hidden="true" value="Zoom In" onclick="onPose('fist');" />
 <input type="button" hidden="true" value="Zoom Out" onclick="onPose('fingerspread');" />
 <p/>
-<input id="tweet" type="text" style="width:100%" value="" />
-
+<input id="tweet" type="text" style="width:100%; background: transparent; border: 0px; color: white; font-size: large; text-align: center;" value="" />
+<script>
+</script>
 </body>
 
 </html>
